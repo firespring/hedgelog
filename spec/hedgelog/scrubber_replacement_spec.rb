@@ -51,4 +51,52 @@ describe Hedgelog::ScrubReplacement do
       end
     end
   end
+
+  describe '#scrub_hash' do
+    subject { Hedgelog::ScrubReplacement.new(key, replacement).scrub_hash(input) }
+    let(:key) { 'password' }
+    let(:replacement) { '*****' }
+
+    context 'the input has the key as a key of the hash' do
+      let(:input) { {foo: 'bar', password: 'baz'} }
+
+      it { should include(password: '*****') }
+    end
+
+    context 'the input has the key as a key of a nested hash' do
+      let(:input) { {foo: 'bar', foo2: {password: 'baz'}} }
+
+      it { should include(foo2: {password: '*****'}) }
+    end
+
+    context 'the input has the key in a string in the value of the hash' do
+      let(:input) { {foo: 'bar', baz: 'password=mypass'} }
+
+      it { should include(baz: 'password=*****') }
+    end
+
+    context 'the input has the key in a string nested in a value of the hash' do
+      let(:input) { {foo: 'bar', foo2: {baz: 'password=mypass'}} }
+
+      it { should include(foo2: {baz: 'password=*****'}) }
+    end
+  end
+
+  describe '#scrub_array' do
+    subject { Hedgelog::ScrubReplacement.new(key, replacement).scrub_array(input) }
+    let(:key) { 'password' }
+    let(:replacement) { '*****' }
+
+    context 'the input has the key as a string value' do
+      let(:input) { ['password=baz'] }
+
+      it { should include('password=*****') }
+    end
+
+    context 'the input has the key in a nested string value' do
+      let(:input) { [['password=baz'], 'bar'] }
+
+      it { should include(['password=*****']) }
+    end
+  end
 end

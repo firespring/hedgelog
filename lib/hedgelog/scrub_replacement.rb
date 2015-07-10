@@ -17,11 +17,20 @@ module Hedgelog
     def scrub_hash(hash)
       hash.map do |key, val|
         val = scrub_string(val) if val.is_a?(String)
-        val = @replacement if key.to_s.downcase == @key.to_s.downcase 
         val = scrub_hash(val) if val.is_a?(Hash)
+        val = scrub_array(val) if val.is_a?(Array)
+        val = @replacement if key.to_s.downcase == @key.to_s.downcase 
         [key, val]
       end.to_h
     end
-    # TODO: Array
+
+    def scrub_array(array)
+      array.map do |val|
+        val = scrub_string(val) if val.is_a?(String)
+        val = scrub_hash(val) if val.is_a?(Hash)
+        val = scrub_array(val) if val.is_a?(Array)
+        val
+      end
+    end
   end
 end
