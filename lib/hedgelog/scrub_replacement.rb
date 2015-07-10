@@ -19,7 +19,7 @@ module Hedgelog
         val = scrub_string(val) if val.is_a?(String)
         val = scrub_hash(val) if val.is_a?(Hash)
         val = scrub_array(val) if val.is_a?(Array)
-        val = @replacement if key.to_s.downcase == @key.to_s.downcase 
+        val = @replacement if key.to_s.downcase == @key.to_s.downcase
         [key, val]
       end.to_h
     end

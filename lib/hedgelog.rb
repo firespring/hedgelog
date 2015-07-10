@@ -1,14 +1,19 @@
-require "hedgelog/version"
-require "hedgelog/scrubber"
+require 'hedgelog/version'
+require 'hedgelog/scrubber'
 require 'logger'
 require 'json'
 
 module Hedgelog
   class Channel
-    LEVELS = %w(DEBUG INFO WARN ERROR FATAL).each_with_object({}).with_index { |(v,h),i| h[v] = i; h[v.downcase] = i; h[v.to_sym] = i; h[v.downcase.to_sym] = i}
-    TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%6N".freeze
+    LEVELS = %w(DEBUG INFO WARN ERROR FATAL).each_with_object({}).with_index do |(v, h), i|
+      h[v] = i
+      h[v.downcase] = i
+      h[v.to_sym] = i
+      h[v.downcase.to_sym] = i
+    end
+    TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N'.freeze
     BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
-      
+
     def initialize(output = STDOUT)
       @context = {}
       @level = ::Logger::DEBUG
@@ -17,13 +22,11 @@ module Hedgelog
         @logger = output
       else
         @logger = ::Logger.new(output)
-        @logger.formatter = proc { |severity, datetime, progname, msg| "#{msg}\n" }
+        @logger.formatter = proc { |_severity, _datetime, _progname, msg| "#{msg}\n" }
       end
     end
 
-    def level
-      @level
-    end
+    attr_reader :level
 
     def level=(level)
       level = level_to_int(level)
@@ -58,10 +61,10 @@ module Hedgelog
       predicate = "#{level}?".to_sym
       level = level.to_sym
 
-      define_method(level) do |message = nil, data={}, &block|
-        raise ::ArgumentError.new("#{self.class.name}##{level}(message, data={}, &block) requires at least 1 argument or a block") if !message && !block
-        raise ::ArgumentError.new("#{self.class.name}##{level}(message, data={}, &block) requires either a message OR a block") if message && block
-        raise ::ArgumentError.new("#{self.class.name}##{level}(message, data={}, &block) the data that you passed was a #{data.class.name}, it must be a Hash") if !data.is_a?(Hash)
+      define_method(level) do |message = nil, data = {}, &block|
+        raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) requires at least 1 argument or a block" if !message && !block
+        raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) requires either a message OR a block" if message && block
+        raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) data was a #{data.class}, it must be a Hash" unless data.is_a?(Hash)
 
         return send(level, *block.call) if block
 
@@ -77,7 +80,7 @@ module Hedgelog
 
     def level_to_int(level)
       return level if level.is_a?(Fixnum)
-      LEVELS[level] 
+      LEVELS[level]
     end
 
     def log_with_level(level, message = nil, data = nil)
@@ -95,21 +98,20 @@ module Hedgelog
       m = BACKTRACE_RE.match(callinfo)
       return unless m
       path, line, method = m[1..3]
-      whence = $:.detect { |p| path.start_with?(p) }
+      whence = $LOAD_PATH.find { |p| path.start_with?(p) }
       if whence
-        # Remove the RUBYLIB path portion of the full file name 
+        # Remove the RUBYLIB path portion of the full file name
         file = path[whence.length + 1..-1]
       else
         # We get here if the path is not in $:
         file = path
       end
-      
+
       {
         file: file,
         line: line,
         method: method
       }
     end
-
   end
 end
