@@ -1,10 +1,19 @@
 module Hedgelog
-  class ScrubReplacement < Struct.new(:key, :replacement)
+  class ScrubReplacement
+    def initialize(key, replacement)
+      @key = key
+      @replacement = replacement
+    end
+
     def scrub_string(string)
-      string.gsub(/#{@key}([=:]).*([&,;\s\n\r$]*)/) do |eql, delim|
-        "#{@key}#{eql}#{@replacement}#{delim}"
+      string.gsub(/("?)#{@key}("?[=:]\s*"?)(.+?)(["&,;\s]|$)/) do
+        start = Regexp.last_match[1]
+        eql = Regexp.last_match[2]
+        delim = Regexp.last_match[4]
+        "#{start}#{@key}#{eql}#{@replacement}#{delim}"
       end
     end
+
     def scrub_hash(hash)
       hash.map do |key, val|
         val = scrub_string(val) if val.is_a?(String)
