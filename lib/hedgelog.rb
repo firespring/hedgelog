@@ -45,7 +45,7 @@ module Hedgelog
           timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
           level: level_from_int(severity)
         )
-        data[:stack_trace] = debugharder(caller[2]) if debug?
+        data[:stack_trace] = debugharder(caller[3]) if debug?
         @logdev.write(Oj.dump(data, mode: :compat))
         @logdev.write("\n")
         return
