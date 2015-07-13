@@ -88,8 +88,7 @@ module Hedgelog
       LEVELS[level]
     end
 
-    def log_with_level(level, message = nil, data = nil)
-      data ||= {}
+    def log_with_level(level, message = nil, data = {})
       data.merge!(@context).merge!(
         level: level,
         message: message,
@@ -97,7 +96,7 @@ module Hedgelog
       )
       data.merge!(debugharder(caller[2])) if debug?
 
-      @scrubber.scrub(data)
+      data = @scrubber.scrub(data)
 
       add(level_to_int(level), Oj.dump(data))
     end

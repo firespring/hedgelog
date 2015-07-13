@@ -9,9 +9,12 @@ module Hedgelog
     end
 
     def scrub(data)
+      # Need to Marshal.dump/Marshal.load to deep copy the input so that scrubbing doesn't change global state
+      d = Marshal.load(Marshal.dump(data))
       @replacements.each do |r|
-        r.scrub_hash(data)
+        r.scrub_hash(d)
       end
+      d
     end
   end
 end

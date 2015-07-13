@@ -15,9 +15,17 @@ describe Hedgelog::Scrubber do
       subject
     end
 
-    it 'returns the scrubbed output' do
-      subject
-      expect(data).to include(message: 'dummy=DUMMY')
+    it 'returns the scrubbed data' do
+      expect(subject).to include(message: 'dummy=DUMMY')
+    end
+
+    it 'does not modify external state' do
+      myvar = 'dummy=1234'
+      orig_myvar = myvar.clone
+
+      data = {foo: myvar}
+      Hedgelog::Scrubber.new(replacements).scrub(data)
+      expect(myvar).to eq orig_myvar
     end
   end
 end
