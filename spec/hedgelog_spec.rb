@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'timecop'
+require 'benchmark'
 
 describe Hedgelog do
   it 'has a version number' do
@@ -31,6 +32,45 @@ describe Hedgelog do
             'timestamp' => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
             'level' => level
           )
+        end
+      end
+    end
+  end
+
+  describe 'performance' do
+    let(:log_dev) { '/dev/null' }
+    let(:standard_logger) { Logger.new(log_dev) }
+    let(:hedgelog_logger) { Hedgelog::Channel.new(log_dev) }
+
+    context 'when logging a string' do
+      let(:message) { 'log message' }
+
+      context 'when in debug mode' do
+        it 'should not be more than 14x slower than standard ruby logger' do
+          standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.debug(message) } }
+          hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.debug(message) } }
+
+          expect(hedgelog_benchmark).to be <= standard_benchmark * 14
+        end
+      end
+
+      context 'when not in debug mode' do
+        let(:standard_logger) do
+          logger = Logger.new(log_dev)
+          logger.level = Logger::INFO
+          logger
+        end
+        let(:hedgelog_logger) do
+          logger = Hedgelog::Channel.new(log_dev)
+          logger.level = Logger::INFO
+          logger
+        end
+
+        it 'should not be more than 7x slower than standard ruby logger' do
+          standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.info(message) } }
+          hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.info(message) } }
+
+          expect(hedgelog_benchmark).to be <= standard_benchmark * 7
         end
       end
     end
