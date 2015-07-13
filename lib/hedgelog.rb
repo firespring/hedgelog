@@ -14,15 +14,16 @@ module Hedgelog
     TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N'.freeze
     BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
-    def initialize(output = STDOUT)
+    def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
       @context = {}
       @level = ::Logger::DEBUG
+      @logger = nil
+      @logdev = nil
 
-      if output.is_a?(self.class)
-        @logger = output
+      if logdev.is_a?(self.class)
+        @logger = logdev
       else
-        @logger = ::Logger.new(output)
-        @logger.formatter = proc { |_severity, _datetime, _progname, msg| "#{msg}\n" }
+        @logdev = Logger::LogDevice.new(logdev, shift_age: shift_age, shift_size: shift_size)
       end
     end
 
@@ -31,11 +32,12 @@ module Hedgelog
     def level=(level)
       level = level_to_int(level)
       @level = level
-      @logger.level = level if @logger.is_a?(Logger)
+      @logger.level = level if @logger
     end
 
     def add(severity, message = nil, progname = nil)
-      @logger.add(severity, message, progname)
+      @logdev.write(message) if @logdev
+      @logger.add(severity, message, progname) if @logger
     end
 
     def []=(key, val)
