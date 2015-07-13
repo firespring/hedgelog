@@ -19,17 +19,19 @@ describe Hedgelog do
         Timecop.return
       end
 
-      subject{ JSON.parse(log_dev.string) }
+      subject { JSON.parse(log_dev.string) }
 
       context 'when log input is the string "FOO" the output' do
-        let(:string) { "FOO" }
+        let(:string) { 'FOO' }
         let(:log_call) { [string] }
 
-        it { should include(
-          "message" => string,
-          "timestamp" => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
-          "level" => level
-        ) }
+        it do
+          should include(
+            'message' => string,
+            'timestamp' => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
+            'level' => level
+          )
+        end
       end
     end
   end

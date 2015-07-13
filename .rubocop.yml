@@ -22,9 +22,6 @@ ClassLength:
 LineLength:
   Max: 150
 
-Blocks:
-  Enabled: false
-
 WordArray:
   Enabled: false
 

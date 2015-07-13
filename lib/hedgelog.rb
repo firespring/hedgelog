@@ -85,12 +85,14 @@ module Hedgelog
 
     def log_with_level(level, message = nil, data = nil)
       data ||= {}
-      data = data.merge(@context)
-      data[:level] = level
-      data[:message] = message
-      data[:timestamp] = Time.now.strftime(TIMESTAMP_FORMAT)
+      data = data.merge(@context).merge(
+        level: level,
+        message: message,
+        timestamp: Time.now.strftime(TIMESTAMP_FORMAT)
+      )
       data = data.merge(debugharder(caller[2])) if debug?
       data = Scrubber.new(data).scrub
+
       add(level_to_int(level), data.to_json)
     end
 
