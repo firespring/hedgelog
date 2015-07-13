@@ -12,7 +12,9 @@ module Hedgelog
       h[v.downcase] = i
       h[v.to_sym] = i
       h[v.downcase.to_sym] = i
+      h[i] = v.downcase.to_sym
     end.freeze
+
     TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N'.freeze
     BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
@@ -38,9 +40,19 @@ module Hedgelog
       @logger.level = level if @logger
     end
 
-    def add(severity, message = nil, progname = nil)
-      @logdev.write(message) if @logdev
-      @logger.add(severity, message, progname) if @logger
+    def add(severity, message = nil, progname = nil, data = {})
+      if @logdev
+        data = @scrubber.scrub(data)
+        data.merge!(
+          timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
+          level: level_from_int(severity)
+        )
+        data[:stack_trace] = debugharder(caller[2]) if debug?
+        @logdev.write(Oj.dump(data))
+        return
+      end
+
+      @logger.add(severity, message, progname, data) if @logger
     end
 
     def []=(key, val)
@@ -51,7 +63,7 @@ module Hedgelog
       @context[key]
     end
 
-    def clear_context
+    def clear_contextd
       @context = {}
     end
 
@@ -88,17 +100,16 @@ module Hedgelog
       LEVELS[level]
     end
 
+    def level_from_int(level)
+      return LEVELS[level] if level.is_a?(Fixnum)
+      level.to_sym
+    end
+
     def log_with_level(level, message = nil, data = {})
-      data.merge!(@context).merge!(
-        level: level,
-        message: message,
-        timestamp: Time.now.strftime(TIMESTAMP_FORMAT)
-      )
-      data.merge!(debugharder(caller[2])) if debug?
+      data.merge!(@context)
+      data[:message] ||= message
 
-      data = @scrubber.scrub(data)
-
-      add(level_to_int(level), Oj.dump(data))
+      add(level_to_int(level), nil, nil, data)
     end
 
     def debugharder(callinfo)
