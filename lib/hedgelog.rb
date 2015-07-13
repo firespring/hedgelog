@@ -82,9 +82,11 @@ module Hedgelog
         raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) requires either a message OR a block" if message && block
         raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) data was a #{data.class}, it must be a Hash" unless data.is_a?(Hash)
 
+        return true unless send(predicate)
+
         return send(level, *block.call) if block
 
-        log_with_level(level, message, data) if send(predicate)
+        log_with_level(level, message, data)
       end
 
       define_method(predicate) do
