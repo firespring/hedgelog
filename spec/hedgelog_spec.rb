@@ -78,6 +78,44 @@ describe Hedgelog do
     end
   end
 
+  describe '#subchannel' do
+    let(:log_dev) { StringIO.new }
+    subject do
+      subchannel.debug 'Foo'
+      Oj.load(log_dev.string)
+    end
+    let(:main_logger) do
+      Hedgelog::Channel.new(log_dev)
+    end
+    let(:subchannel) do
+      main_logger.subchannel('subchannel')
+    end
+
+    it { should include('subchannel' => 'subchannel') }
+
+    context 'with context on the main channel' do
+      before :each do
+        main_logger[:c1] = 'test'
+      end
+      after :each do
+        main_logger.clear_context
+      end
+
+      it { should include('c1' => 'test') }
+    end
+
+    context 'with context on the subchannel' do
+      before :each do
+        subchannel[:c2] = 'test'
+      end
+      after :each do
+        subchannel.clear_context
+      end
+
+      it { should include('c2' => 'test') }
+    end
+  end
+
   describe 'performance' do
     let(:log_dev) { '/dev/null' }
     let(:standard_logger) { Logger.new(log_dev) }

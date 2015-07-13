@@ -38,7 +38,7 @@ module Hedgelog
       @logger.level = level if @logger
     end
 
-    def add(severity, message = nil, progname = nil, data = {})
+    def add(severity, message = nil, _progname = nil, data = {})
       if @logdev
         data = @scrubber.scrub(data)
         data.merge!(
@@ -51,7 +51,8 @@ module Hedgelog
         return
       end
 
-      @logger.add(severity, message, progname, data) if @logger
+      # @logger.add(severity, message, progname, data) if @logger
+      @logger.send(:log_with_level, severity, message, data) if @logger
     end
 
     def []=(key, val)
@@ -62,7 +63,7 @@ module Hedgelog
       @context[key]
     end
 
-    def clear_contextd
+    def clear_context
       @context = {}
     end
 
