@@ -1,0 +1,9 @@
+---
+:checks_add:
+- :rubocop
+- :ruby
+- :pry
+- :merge_conflict
+- :rspec_focus
+:checks_remove:
+- :rails
