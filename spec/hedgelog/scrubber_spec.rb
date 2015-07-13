@@ -5,7 +5,7 @@ dummy_scrubber = Hedgelog::ScrubReplacement.new(:dummy, 'DUMMY')
 
 describe Hedgelog::Scrubber do
   describe '#scrub' do
-    subject { Hedgelog::Scrubber.new(data, replacements).scrub }
+    subject { Hedgelog::Scrubber.new(replacements).scrub(data) }
 
     let(:replacements) { [dummy_scrubber] }
     let(:data) { {message: 'dummy=1234'} }
@@ -16,7 +16,8 @@ describe Hedgelog::Scrubber do
     end
 
     it 'returns the scrubbed output' do
-      expect(subject).to include(message: 'dummy=DUMMY')
+      subject
+      expect(data).to include(message: 'dummy=DUMMY')
     end
   end
 end

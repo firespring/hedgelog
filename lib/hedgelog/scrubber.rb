@@ -2,19 +2,16 @@ require 'hedgelog/scrub_replacement'
 
 module Hedgelog
   class Scrubber
-    def initialize(data, replacements = nil)
-      @data = data
+    def initialize(replacements = nil)
       @replacements = replacements || [
         ScrubReplacement.new('pasword', '**********')
       ]
     end
 
-    def scrub
-      data = @data
+    def scrub(data)
       @replacements.each do |r|
-        data = r.scrub_hash(data)
+        r.scrub_hash(data)
       end
-      data
     end
   end
 end

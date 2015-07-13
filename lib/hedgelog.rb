@@ -21,6 +21,7 @@ module Hedgelog
       @level = ::Logger::DEBUG
       @logger = nil
       @logdev = nil
+      @scrubber = Scrubber.new
 
       if logdev.is_a?(self.class)
         @logger = logdev
@@ -96,7 +97,7 @@ module Hedgelog
       )
       data.merge!(debugharder(caller[2])) if debug?
 
-      data = Scrubber.new(data).scrub
+      @scrubber.scrub(data)
 
       add(level_to_int(level), Oj.dump(data))
     end

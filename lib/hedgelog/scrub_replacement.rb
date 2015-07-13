@@ -18,12 +18,12 @@ module Hedgelog
     def scrub_hash(hash)
       hash.each do |key, val|
         next hash[key] = @replacement if key.to_s.downcase == @key.to_s.downcase
-        hash[key] = scrub_thing(val)
+        scrub_thing(val)
       end
     end
 
     def scrub_array(array)
-      array.map! do |val|
+      array.each do |val|
         scrub_thing(val)
       end
     end
@@ -34,7 +34,6 @@ module Hedgelog
       scrub_string(thing) if thing.is_a?(String)
       scrub_array(thing) if thing.is_a?(Array)
       scrub_hash(thing) if thing.is_a?(Hash)
-      thing
     end
   end
 end
