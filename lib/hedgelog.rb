@@ -10,7 +10,7 @@ module Hedgelog
       h[v.downcase] = i
       h[v.to_sym] = i
       h[v.downcase.to_sym] = i
-    end
+    end.freeze
     TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N'.freeze
     BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
