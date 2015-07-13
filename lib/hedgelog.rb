@@ -3,8 +3,6 @@ require 'hedgelog/scrubber'
 require 'logger'
 require 'oj'
 
-Oj.default_options = {mode: :compat}
-
 module Hedgelog
   class Channel
     LEVELS = %w(DEBUG INFO WARN ERROR FATAL).each_with_object({}).with_index do |(v, h), i|
@@ -48,7 +46,8 @@ module Hedgelog
           level: level_from_int(severity)
         )
         data[:stack_trace] = debugharder(caller[2]) if debug?
-        @logdev.write(Oj.dump(data))
+        @logdev.write(Oj.dump(data, mode: :compat))
+        @logdev.write("\n")
         return
       end
 
