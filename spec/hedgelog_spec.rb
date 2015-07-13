@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'timecop'
 require 'benchmark'
+require 'oj'
 
 describe Hedgelog do
   it 'has a version number' do
@@ -20,7 +21,7 @@ describe Hedgelog do
         Timecop.return
       end
 
-      subject { JSON.parse(log_dev.string) }
+      subject { Oj.load(log_dev.string) }
 
       context 'when log input is the string "FOO" the output' do
         let(:string) { 'FOO' }
