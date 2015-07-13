@@ -46,8 +46,7 @@ module Hedgelog
           level: level_from_int(severity)
         )
         data[:stack_trace] = debugharder(caller[3]) if debug?
-        @logdev.write(Oj.dump(data, mode: :compat))
-        @logdev.write("\n")
+        @logdev.write(Oj.dump(data, mode: :compat) + "\n")
         return
       end
 
