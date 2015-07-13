@@ -1,7 +1,9 @@
 require 'hedgelog/version'
 require 'hedgelog/scrubber'
 require 'logger'
-require 'json'
+require 'oj'
+
+Oj.default_options = {mode: :compat}
 
 module Hedgelog
   class Channel
@@ -95,7 +97,7 @@ module Hedgelog
       data = data.merge(debugharder(caller[2])) if debug?
       data = Scrubber.new(data).scrub
 
-      add(level_to_int(level), data.to_json)
+      add(level_to_int(level), Oj.dump(data))
     end
 
     def debugharder(callinfo)
