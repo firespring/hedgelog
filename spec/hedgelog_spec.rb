@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'timecop'
 
 describe Hedgelog do
   it 'has a version number' do
@@ -10,7 +11,12 @@ describe Hedgelog do
 
     describe "\##{level}" do
       before :each do
+        Timecop.freeze(2015, 01, 01)
         Hedgelog::Channel.new(log_dev).send(level, *log_call)
+      end
+
+      after :each do
+        Timecop.return
       end
 
       subject{ JSON.parse(log_dev.string) }
@@ -19,7 +25,11 @@ describe Hedgelog do
         let(:string) { "FOO" }
         let(:log_call) { [string] }
 
-        it { should include("message" => string) }
+        it { should include(
+          "message" => string,
+          "timestamp" => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
+          "level" => level
+        ) }
       end
     end
   end
