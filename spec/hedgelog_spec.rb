@@ -78,6 +78,58 @@ describe Hedgelog do
     end
   end
 
+  describe 'context' do
+    let(:log_dev) { StringIO.new }
+    subject do
+      logger.debug 'Foo'
+      Oj.load(log_dev.string)
+    end
+    let(:logger) do
+      Hedgelog::Channel.new(log_dev)
+    end
+    context 'with context set on the channel' do
+      before :each do
+        logger[:foo] = 'bar'
+      end
+      it 'returns the set context when used like a hash' do
+        expect(logger[:foo]).to eq 'bar'
+      end
+      it { should include('foo' => 'bar') }
+    end
+  end
+
+  # This test is just for coverage
+  describe '#level_from_int' do
+    let(:log_dev) { StringIO.new }
+    let(:logger) do
+      Hedgelog::Channel.new(log_dev)
+    end
+    it 'returns a symbol for the level name, given the related integer' do
+      expect(logger.send(:level_from_int, 0)).to eq :debug
+    end
+    it 'returns a symbol if a symbol or string are passed in' do
+      expect(logger.send(:level_from_int, :debug)).to eq :debug
+      expect(logger.send(:level_from_int, 'debug')).to eq :debug
+    end
+  end
+
+  # This test is just for coverage
+  describe '#log_with_level' do
+    let(:log_dev) { StringIO.new }
+    let(:logger) do
+      Hedgelog::Channel.new(log_dev)
+    end
+    let(:callinfo) { '' }
+
+    context 'when the path is out of the load path' do
+      it 'doesnt explode' do
+        expect(Hedgelog::Channel::BACKTRACE_RE).to receive(:match).with(callinfo) { [] }
+        expect($LOAD_PATH).to receive(:find) { false }
+        logger.send(:debugharder, callinfo)
+      end
+    end
+  end
+
   describe '#subchannel' do
     let(:log_dev) { StringIO.new }
     subject do
