@@ -1,8 +1,6 @@
 # Hedgelog
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/hedgelog`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This gem provides an opinionated Ruby logger for writing structured JSON logs. It attempts to maintain compatibility with the standard Ruby logging class while extending it with functionality relevant to JSON logging.
 
 ## Installation
 
@@ -20,15 +18,64 @@ Or install it yourself as:
 
     $ gem install hedgelog
 
-## Usage
+## Basic Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'hedgelog'
 
-## Development
+# Logging defaults to STDOUT or you can pass a file path to .new
+logger = Hedgelog::Channel.new
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+logger.level = :info
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+logger.debug "Foo"
+# No Output
+
+logger.info "Foo"
+=> {"message":"FOO","timestamp":"2015-07-15T12:03:08.257356","level":"info"}
+
+logger.info "FOO", sample: 'data'
+=> {"sample":"data","message":"FOO","timestamp":"2015-07-15T12:05:02.302202","level":"info"}
+
+# It also supports logging as a block with extra data
+logger.info { ["FOO", {sample: 'data'}] }
+=> {"sample":"data","message":"FOO","timestamp":"2015-07-15T12:06:20.026807","level":"info"}
+```
+
+## Context
+
+Hedgelog allows adding additional context to an instance of a logger that will get output with each log message
+
+```ruby
+logger[:request_id] = 1234
+=> 1234
+logger.info "FOO"
+=> {"request_id":1234,"message":"FOO","timestamp":"2015-07-15T12:09:33.129984","level":"info"}
+```
+
+## Sub-channels
+
+One of the primary features of Hedgelog is the usage of sub-channels.
+
+Sub-channels can have their own context separate from the main loggers context. This allows including additional information for all log messages from a portion of your application.
+
+```ruby
+subchannel = logger.subchannel(:database)
+subchannel.info "FOO"
+=> {"subchannel":"database","message":"FOO","timestamp":"2015-07-15T12:12:39.147210","level":"info"}
+
+# The subchannel does not effect the primary instance of the logger
+logger.info "FOO"
+=>{"message":"FOO","timestamp":"2015-07-15T12:13:31.132059","level":"info"}
+```
+
+The sub-channel instances conform to the same interface as Hedgelog. Therefore they can be passed in as standard Ruby loggers to gems that take an instance of Ruby logger for input.
+
+```ruby
+DataMapper.logger = logger.subchannel(:database)
+```
+
+## Scrubbing
 
 ## Contributing
 
