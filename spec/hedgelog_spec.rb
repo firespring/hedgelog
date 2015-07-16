@@ -96,6 +96,16 @@ describe Hedgelog do
       end
       it { should include('foo' => 'bar') }
     end
+    context 'when deleting something from the context' do
+      before :each do
+        logger[:foo] = 'bar'
+        logger.delete(:foo)
+      end
+      it 'does not return the value  when used like a hash' do
+        expect(logger[:foo]).to_not eq 'bar'
+      end
+      it { should_not include('foo' => 'bar') }
+    end
   end
 
   # This test is just for coverage

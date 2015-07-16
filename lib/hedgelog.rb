@@ -62,6 +62,10 @@ module Hedgelog
       @context[key]
     end
 
+    def delete(key)
+      @context.delete(key)
+    end
+
     def clear_context
       @context = {}
     end
