@@ -8,45 +8,48 @@ describe Hedgelog do
     expect(Hedgelog::VERSION).not_to be nil
   end
 
-  %w(debug info warn error fatal).each do |level|
-    let(:log_dev) { StringIO.new }
-    let(:log_block) {}
+  let(:log_dev) { StringIO.new }
+  let(:log_level) { Logger::INFO }
+  let(:logger) { Hedgelog::Channel.new(log_dev) }
+  let(:log_exec) { -> { logger.debug 'foo' } }
+  let(:log_results) { log_dev.string }
+  subject do
+    log_exec.call
+    logger.level = log_level
+    Oj.load(log_results)
+  end
 
+  %w(debug info warn error fatal).each do |level|
     describe "\##{level}" do
+      let(:log_level) { level.to_sym }
       before :each do
         Timecop.freeze(2015, 01, 01)
-        Hedgelog::Channel.new(log_dev).send(level, *log_call, &log_block)
       end
 
       after :each do
         Timecop.return
       end
 
-      subject { Oj.load(log_dev.string) }
-
       context 'when log input is the string "FOO" the output' do
-        let(:string) { 'FOO' }
-        let(:log_call) { [string] }
+        let(:log_exec) { -> { logger.fatal 'FOO' } }
 
         it do
           should include(
-            'message' => string,
+            'message' => 'FOO',
             'timestamp' => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
-            'level' => level
+            'level' => 'fatal'
           )
         end
       end
 
       context 'when log input is a block containing the string "FOO" the output' do
-        let(:string) { 'FOO' }
-        let(:log_call) { [] }
-        let(:log_block) { -> { 'FOO' } }
+        let(:log_exec) { -> { logger.fatal { 'FOO' } } }
 
         it do
           should include(
-            'message' => string,
+            'message' => 'FOO',
             'timestamp' => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
-            'level' => level
+            'level' => 'fatal'
           )
         end
       end
@@ -54,39 +57,22 @@ describe Hedgelog do
   end
 
   describe "when the channel's level is higher than the called level" do
-    subject { log_dev.string }
-    let(:log_dev) { StringIO.new }
-    let(:log_exec) { logger.debug 'foo' }
-    let(:logger) do
-      logger = Hedgelog::Channel.new(log_dev)
-      logger.level = Logger::INFO
-      logger
-    end
+    let(:log_level) { :info }
 
     it 'is not log the message' do
-      log_exec
-      expect(subject).to be_empty
+      expect(log_results).to be_empty
     end
 
     context 'and the logger is passed a block' do
-      let(:log_exec) { logger.debug { raise Exception, 'This is not be evaluated' } }
+      let(:log_exec) { -> { logger.debug { raise Exception, 'This is not be evaluated' } } }
 
       it 'does not log the message' do
-        log_exec
-        expect(subject).to be_empty
+        expect(log_results).to be_empty
       end
     end
   end
 
   describe 'context' do
-    let(:log_dev) { StringIO.new }
-    subject do
-      logger.debug 'Foo'
-      Oj.load(log_dev.string)
-    end
-    let(:logger) do
-      Hedgelog::Channel.new(log_dev)
-    end
     context 'with context set on the channel' do
       before :each do
         logger[:foo] = 'bar'
@@ -110,10 +96,6 @@ describe Hedgelog do
 
   # This test is just for coverage
   describe '#level_from_int' do
-    let(:log_dev) { StringIO.new }
-    let(:logger) do
-      Hedgelog::Channel.new(log_dev)
-    end
     it 'returns a symbol for the level name, given the related integer' do
       expect(logger.send(:level_from_int, 0)).to eq :debug
     end
@@ -125,10 +107,6 @@ describe Hedgelog do
 
   # This test is just for coverage
   describe '#log_with_level' do
-    let(:log_dev) { StringIO.new }
-    let(:logger) do
-      Hedgelog::Channel.new(log_dev)
-    end
     let(:callinfo) { '' }
 
     context 'when the path is out of the load path' do
@@ -141,26 +119,22 @@ describe Hedgelog do
   end
 
   describe '#subchannel' do
-    let(:log_dev) { StringIO.new }
+    let(:subchannel) do
+      logger.subchannel('subchannel')
+    end
     subject do
       subchannel.debug 'Foo'
       Oj.load(log_dev.string)
-    end
-    let(:main_logger) do
-      Hedgelog::Channel.new(log_dev)
-    end
-    let(:subchannel) do
-      main_logger.subchannel('subchannel')
     end
 
     it { should include('subchannel' => 'subchannel') }
 
     context 'with context on the main channel' do
       before :each do
-        main_logger[:c1] = 'test'
+        logger[:c1] = 'test'
       end
       after :each do
-        main_logger.clear_context
+        logger.clear_context
       end
 
       it { should include('c1' => 'test') }
