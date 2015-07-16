@@ -19,7 +19,7 @@ describe Hedgelog do
     Oj.load(log_results)
   end
 
-  %w(debug info warn error fatal).each do |level|
+  %w(debug info warn error fatal unknown).each do |level|
     describe "\##{level}" do
       let(:log_level) { level.to_sym }
       before :each do

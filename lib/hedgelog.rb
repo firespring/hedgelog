@@ -5,7 +5,7 @@ require 'oj'
 
 module Hedgelog
   class Channel
-    LEVELS = %w(DEBUG INFO WARN ERROR FATAL).each_with_object({}).with_index do |(v, h), i|
+    LEVELS = %w(DEBUG INFO WARN ERROR FATAL UNKNOWN).each_with_object({}).with_index do |(v, h), i|
       h[v] = i
       h[v.downcase] = i
       h[v.to_sym] = i
@@ -77,7 +77,7 @@ module Hedgelog
       sc
     end
 
-    %w(fatal error warn info debug).each do |level|
+    %w(fatal error warn info debug unknown).each do |level|
       predicate = "#{level}?".to_sym
       level = level.to_sym
 
