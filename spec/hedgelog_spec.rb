@@ -150,6 +150,14 @@ describe Hedgelog do
 
       it { should include('c2' => 'test') }
     end
+
+    context 'when subchannels are nested' do
+      let(:subchannel) do
+        logger.subchannel('subchannel').subchannel('nested_subchannel')
+      end
+
+      it { should include('subchannel' => 'subchannel => nested_subchannel') }
+    end
   end
 
   describe 'performance' do

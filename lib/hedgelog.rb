@@ -19,12 +19,12 @@ module Hedgelog
     def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
       @context = {}
       @level = ::Logger::DEBUG
-      @logger = nil
+      @channel = nil
       @logdev = nil
       @scrubber = Scrubber.new
 
       if logdev.is_a?(self.class)
-        @logger = logdev
+        @channel = logdev
       else
         @logdev = Logger::LogDevice.new(logdev, shift_age: shift_age, shift_size: shift_size)
       end
@@ -35,7 +35,7 @@ module Hedgelog
     def level=(level)
       level = level_to_int(level)
       @level = level
-      @logger.level = level if @logger
+      @channel.level = level if @channel
     end
 
     def add(severity, message = nil, _progname = nil, data = {})
@@ -50,8 +50,7 @@ module Hedgelog
         return
       end
 
-      # @logger.add(severity, message, progname, data) if @logger
-      @logger.send(:log_with_level, severity, message, data) if @logger
+      @channel.send(:log_with_level, severity, message, data) if @channel
     end
 
     def []=(key, val)
@@ -73,7 +72,9 @@ module Hedgelog
     def subchannel(name)
       sc = self.class.new(self)
       sc.level = @level
-      sc[:subchannel] = name
+      subchannel_name = name
+      subchannel_name = "#{self[:subchannel]} => #{name}" if self[:subchannel]
+      sc[:subchannel] = subchannel_name
       sc
     end
 
@@ -111,7 +112,7 @@ module Hedgelog
     end
 
     def log_with_level(level, message = nil, data = {})
-      data.merge!(@context)
+      data = @context.merge(data)
       data[:message] ||= message
 
       add(level_to_int(level), nil, nil, data)
