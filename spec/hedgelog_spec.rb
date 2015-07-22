@@ -56,6 +56,74 @@ describe Hedgelog do
     end
   end
 
+  describe '#add' do
+    subject do
+      logger = Hedgelog::Channel.new(log_dev)
+      logger.level = log_level
+      logger.add(severity, message, progname, data, &block)
+    end
+    let(:message) { 'Foo' }
+    let(:progname) { nil }
+    let(:data) { {} }
+    let(:block) { nil }
+    let(:severity) { 1 }
+
+    context 'when the severity is lower than the log level' do
+      let(:log_level) { Logger::FATAL }
+
+      it { should be true }
+    end
+
+    context 'when logging with only a message' do
+      it 'writes the message in the json hash' do
+        subject
+        expect(JSON.parse(log_results)).to include('message' => 'Foo')
+      end
+    end
+
+    context 'when logging with a message and data' do
+      let(:data) { {bar: 'baz'} }
+      it 'writes the message in the json hash' do
+        subject
+        expect(JSON.parse(log_results)).to include('message' => 'Foo', 'bar' => 'baz')
+      end
+    end
+
+    context 'when logging with a string only block' do
+      let(:message) { nil }
+      let(:block) { -> { 'Foo' } }
+
+      it 'writes the message in the json hash' do
+        subject
+        expect(JSON.parse(log_results)).to include('message' => 'Foo')
+      end
+    end
+
+    context 'when logging with a string and data block' do
+      let(:message) { nil }
+      let(:block) { -> { ['Foo', {bar: 'baz'}] } }
+
+      it 'writes the message in the json hash' do
+        subject
+        expect(JSON.parse(log_results)).to include('message' => 'Foo', 'bar' => 'baz')
+      end
+    end
+
+    context 'when logging to a subchannel' do
+      let(:logger) { Hedgelog::Channel.new(log_dev) }
+      subject do
+        logger.level = log_level
+        subchannel = logger.subchannel(:subchannel)
+        subchannel.add(severity, message, progname, data, &block)
+      end
+
+      it 'calls .add recursively on the channel' do
+        expect(logger).to receive(:add).with(severity, nil, nil, subchannel: :subchannel, message: 'Foo')
+        subject
+      end
+    end
+  end
+
   describe "when the channel's level is higher than the called level" do
     let(:log_level) { :info }
 
@@ -106,7 +174,7 @@ describe Hedgelog do
   end
 
   # This test is just for coverage
-  describe '#log_with_level' do
+  describe '#debugharder' do
     let(:callinfo) { '' }
 
     context 'when the path is out of the load path' do
@@ -169,11 +237,11 @@ describe Hedgelog do
       let(:message) { 'log message' }
 
       context 'when in debug mode' do
-        it 'is not be more than 7.5x slower than standard ruby logger' do
+        it 'is not be more than 8x slower than standard ruby logger' do
           standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.debug(message) } }
           hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.debug(message) } }
 
-          expect(hedgelog_benchmark).to be <= standard_benchmark * 7.5
+          expect(hedgelog_benchmark).to be <= standard_benchmark * 8
         end
       end
 

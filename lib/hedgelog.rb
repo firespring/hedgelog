@@ -49,7 +49,7 @@ module Hedgelog
 
       return write(severity, data) if @logdev
 
-      @channel.add(severity, message, progname, data) if @channel
+      @channel.add(severity, nil, progname, data) if @channel
     end
 
     def []=(key, val)
@@ -117,8 +117,6 @@ module Hedgelog
         level: level_from_int(severity)
       )
       data[:caller] = debugharder(caller[3]) if debug?
-      # @logdev.write(Oj.dump(data, mode: :compat) + "\n")
-      # @logdev.write(data.to_json + "\n")
       @logdev.write(Yajl::Encoder.encode(data) + "\n")
     end
 
