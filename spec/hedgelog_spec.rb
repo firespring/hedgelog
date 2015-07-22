@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'timecop'
 require 'benchmark'
-require 'oj'
+require 'json'
 
 describe Hedgelog do
   it 'has a version number' do
@@ -16,7 +16,7 @@ describe Hedgelog do
   subject do
     log_exec.call
     logger.level = log_level
-    Oj.load(log_results)
+    JSON.parse(log_results)
   end
 
   %w(debug info warn error fatal unknown).each do |level|
@@ -124,7 +124,7 @@ describe Hedgelog do
     end
     subject do
       subchannel.debug 'Foo'
-      Oj.load(log_dev.string)
+      JSON.parse(log_dev.string)
     end
 
     it { should include('subchannel' => 'subchannel') }
@@ -189,11 +189,11 @@ describe Hedgelog do
           logger
         end
 
-        it 'is not be more than 3x slower than standard ruby logger' do
+        it 'is not be more than 3.5x slower than standard ruby logger' do
           standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.info(message) } }
           hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.info(message) } }
 
-          expect(hedgelog_benchmark).to be <= standard_benchmark * 3
+          expect(hedgelog_benchmark).to be <= standard_benchmark * 3.5
         end
       end
     end

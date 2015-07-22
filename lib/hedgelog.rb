@@ -1,7 +1,7 @@
 require 'hedgelog/version'
 require 'hedgelog/scrubber'
 require 'logger'
-require 'oj'
+require 'yajl'
 
 module Hedgelog
   class Channel
@@ -18,7 +18,7 @@ module Hedgelog
 
     def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
       @context = {}
-      @level = ::Logger::DEBUG
+      @level = LEVELS[:debug]
       @channel = nil
       @logdev = nil
       @scrubber = Scrubber.new
@@ -35,22 +35,21 @@ module Hedgelog
     def level=(level)
       level = level_to_int(level)
       @level = level
-      @channel.level = level if @channel
     end
 
-    def add(severity, message = nil, _progname = nil, data = {})
-      if @logdev
-        data = @scrubber.scrub(data)
-        data.merge!(
-          timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
-          level: level_from_int(severity)
-        )
-        data[:stack_trace] = debugharder(caller[3]) if debug?
-        @logdev.write(Oj.dump(data, mode: :compat) + "\n")
-        return
-      end
+    def add(severity, message = nil, progname = nil, data = {}, &block)
+      severity ||= LEVELS[:unknown]
+      return true if (@logdev.nil? && @channel.nil?) || severity < @level
 
-      @channel.send(:log_with_level, severity, message, data) if @channel
+      message, data = *block.call if block
+      data ||= {}
+
+      data = @context.merge(data)
+      data[:message] ||= message
+
+      return write(severity, data) if @logdev
+
+      @channel.add(severity, message, progname, data) if @channel
     end
 
     def []=(key, val)
@@ -89,9 +88,7 @@ module Hedgelog
 
         return true unless send(predicate)
 
-        return send(level, *block.call) if block
-
-        log_with_level(level, message, data)
+        add(level_to_int(level), message, nil, data, &block)
       end
 
       define_method(predicate) do
@@ -111,11 +108,18 @@ module Hedgelog
       level.to_sym
     end
 
-    def log_with_level(level, message = nil, data = {})
-      data = @context.merge(data)
-      data[:message] ||= message
+    def write(severity, data)
+      return true if @logdev.nil?
 
-      add(level_to_int(level), nil, nil, data)
+      data = @scrubber.scrub(data)
+      data.merge!(
+        timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
+        level: level_from_int(severity)
+      )
+      data[:caller] = debugharder(caller[3]) if debug?
+      # @logdev.write(Oj.dump(data, mode: :compat) + "\n")
+      # @logdev.write(data.to_json + "\n")
+      @logdev.write(Yajl::Encoder.encode(data) + "\n")
     end
 
     def debugharder(callinfo)
