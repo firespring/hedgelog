@@ -1,3 +1,3 @@
-module Hedgelog
+class Hedgelog
   VERSION = '0.1.0'
 end

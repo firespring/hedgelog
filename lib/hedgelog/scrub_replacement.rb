@@ -1,4 +1,4 @@
-module Hedgelog
+class Hedgelog
   class ScrubReplacement
     def initialize(key, replacement)
       @key = key

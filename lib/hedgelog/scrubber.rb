@@ -1,6 +1,6 @@
 require 'hedgelog/scrub_replacement'
 
-module Hedgelog
+class Hedgelog
   class Scrubber
     def initialize(replacements = nil)
       @replacements = replacements || [

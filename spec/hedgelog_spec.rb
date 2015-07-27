@@ -10,7 +10,7 @@ describe Hedgelog do
 
   let(:log_dev) { StringIO.new }
   let(:log_level) { Logger::INFO }
-  let(:logger) { Hedgelog::Channel.new(log_dev) }
+  let(:logger) { Hedgelog.new(log_dev) }
   let(:log_exec) { -> { logger.debug 'foo' } }
   let(:log_results) { log_dev.string }
   subject do
@@ -36,8 +36,9 @@ describe Hedgelog do
         it do
           should include(
             'message' => 'FOO',
-            'timestamp' => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
-            'level' => 'fatal'
+            'timestamp' => Time.now.strftime(Hedgelog::TIMESTAMP_FORMAT),
+            'level_name' => 'fatal',
+            'level' => 4
           )
         end
       end
@@ -48,8 +49,9 @@ describe Hedgelog do
         it do
           should include(
             'message' => 'FOO',
-            'timestamp' => Time.now.strftime(Hedgelog::Channel::TIMESTAMP_FORMAT),
-            'level' => 'fatal'
+            'timestamp' => Time.now.strftime(Hedgelog::TIMESTAMP_FORMAT),
+            'level_name' => 'fatal',
+            'level' => 4
           )
         end
       end
@@ -58,7 +60,7 @@ describe Hedgelog do
 
   describe '#add' do
     subject do
-      logger = Hedgelog::Channel.new(log_dev)
+      logger = Hedgelog.new(log_dev)
       logger.level = log_level
       logger.add(severity, message, progname, data, &block)
     end
@@ -112,7 +114,7 @@ describe Hedgelog do
     end
 
     context 'when logging to a channel' do
-      let(:logger) { Hedgelog::Channel.new(log_dev) }
+      let(:logger) { Hedgelog.new(log_dev) }
       subject do
         logger.level = log_level
         channel = logger.channel(:channel)
@@ -185,7 +187,7 @@ describe Hedgelog do
 
     context 'when the path is out of the load path' do
       it 'doesnt explode' do
-        expect(Hedgelog::Channel::BACKTRACE_RE).to receive(:match).with(callinfo) { [] }
+        expect(Hedgelog::BACKTRACE_RE).to receive(:match).with(callinfo) { [] }
         expect($LOAD_PATH).to receive(:find) { false }
         logger.send(:debugharder, callinfo)
       end
@@ -241,7 +243,7 @@ describe Hedgelog do
   describe 'performance' do
     let(:log_dev) { '/dev/null' }
     let(:standard_logger) { Logger.new(log_dev) }
-    let(:hedgelog_logger) { Hedgelog::Channel.new(log_dev) }
+    let(:hedgelog_logger) { Hedgelog.new(log_dev) }
 
     context 'when logging a string' do
       let(:message) { 'log message' }
@@ -262,7 +264,7 @@ describe Hedgelog do
           logger
         end
         let(:hedgelog_logger) do
-          logger = Hedgelog::Channel.new(log_dev)
+          logger = Hedgelog.new(log_dev)
           logger.level = Logger::INFO
           logger
         end
