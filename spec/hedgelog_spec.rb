@@ -85,7 +85,8 @@ describe Hedgelog do
       let(:data) { {bar: 'baz'} }
       it 'writes the message in the json hash' do
         subject
-        expect(JSON.parse(log_results)).to include('message' => 'Foo', 'bar' => 'baz')
+        expect(JSON.parse(log_results)).to include('message' => 'Foo')
+        expect(JSON.parse(log_results)['context']).to include('bar' => 'baz')
       end
     end
 
@@ -105,20 +106,21 @@ describe Hedgelog do
 
       it 'writes the message in the json hash' do
         subject
-        expect(JSON.parse(log_results)).to include('message' => 'Foo', 'bar' => 'baz')
+        expect(JSON.parse(log_results)).to include('message' => 'Foo')
+        expect(JSON.parse(log_results)['context']).to include('bar' => 'baz')
       end
     end
 
-    context 'when logging to a subchannel' do
+    context 'when logging to a channel' do
       let(:logger) { Hedgelog::Channel.new(log_dev) }
       subject do
         logger.level = log_level
-        subchannel = logger.subchannel(:subchannel)
-        subchannel.add(severity, message, progname, data, &block)
+        channel = logger.channel(:channel)
+        channel.add(severity, message, progname, data, &block)
       end
 
       it 'calls .add recursively on the channel' do
-        expect(logger).to receive(:add).with(severity, nil, nil, subchannel: :subchannel, message: 'Foo')
+        expect(logger).to receive(:add).with(severity, nil, nil, channel: :channel, message: 'Foo')
         subject
       end
     end
@@ -148,7 +150,9 @@ describe Hedgelog do
       it 'returns the set context when used like a hash' do
         expect(logger[:foo]).to eq 'bar'
       end
-      it { should include('foo' => 'bar') }
+      it 'contains the context under the "context" key' do
+        expect(subject['context']).to include('foo' => 'bar')
+      end
     end
     context 'when deleting something from the context' do
       before :each do
@@ -158,7 +162,9 @@ describe Hedgelog do
       it 'does not return the value  when used like a hash' do
         expect(logger[:foo]).to_not eq 'bar'
       end
-      it { should_not include('foo' => 'bar') }
+      it 'does not contain the context under the "context" key' do
+        expect(subject['context']).to_not include('foo' => 'bar')
+      end
     end
   end
 
@@ -186,45 +192,49 @@ describe Hedgelog do
     end
   end
 
-  describe '#subchannel' do
-    let(:subchannel) do
-      logger.subchannel('subchannel')
+  describe '#channel' do
+    let(:channel) do
+      logger.channel('channel')
     end
     subject do
-      subchannel.debug 'Foo'
+      channel.debug 'Foo'
       JSON.parse(log_dev.string)
     end
 
-    it { should include('subchannel' => 'subchannel') }
+    it { should include('channel' => 'channel') }
 
     context 'with context on the main channel' do
       before :each do
         logger[:c1] = 'test'
       end
       after :each do
-        logger.clear_context
+        logger.clear_channel_context
       end
 
-      it { should include('c1' => 'test') }
+      it 'includes the context under the "context" key' do
+        expect(subject['context']).to include('c1' => 'test')
+      end
     end
 
-    context 'with context on the subchannel' do
+    context 'with context on the channel' do
       before :each do
-        subchannel[:c2] = 'test'
+        channel[:c2] = 'test'
       end
       after :each do
-        subchannel.clear_context
+        channel.clear_channel_context
       end
 
-      it { should include('c2' => 'test') }
+      it 'includes the context under the "context" key' do
+        expect(subject['context']).to include('c2' => 'test')
+      end
     end
 
-    context 'when subchannels are nested' do
-      let(:subchannel) do
-        logger.subchannel('subchannel').subchannel('nested_subchannel')
+    context 'when channels are nested' do
+      let(:channel) do
+        logger.channel('channel').channel('nested_channel')
       end
 
-      it { should include('subchannel' => 'subchannel => nested_subchannel') }
+      it { should include('channel' => 'channel => nested_channel') }
     end
   end
 
@@ -257,11 +267,11 @@ describe Hedgelog do
           logger
         end
 
-        it 'is not be more than 3.5x slower than standard ruby logger' do
+        it 'is not be more than 4x slower than standard ruby logger' do
           standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.info(message) } }
           hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.info(message) } }
 
-          expect(hedgelog_benchmark).to be <= standard_benchmark * 3.5
+          expect(hedgelog_benchmark).to be <= standard_benchmark * 4
         end
       end
     end

@@ -13,11 +13,14 @@ module Hedgelog
       h[i] = v.downcase.to_sym
     end.freeze
 
+    TOP_LEVEL_KEYS = Set.new([:app, :channel, :level, :level_name, :message, :request_id, :timestamp]).freeze
+    RESERVED_KEYS = Set.new([:app, :level, :level_name, :timestamp, :context, :caller]).freeze
+
     TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N'.freeze
     BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
     def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
-      @context = {}
+      @channel_context = {}
       @level = LEVELS[:debug]
       @channel = nil
       @logdev = nil
@@ -37,43 +40,45 @@ module Hedgelog
       @level = level
     end
 
-    def add(severity, message = nil, progname = nil, data = {}, &block)
+    def add(severity, message = nil, progname = nil, context = {}, &block)
       severity ||= LEVELS[:unknown]
       return true if (@logdev.nil? && @channel.nil?) || severity < @level
 
-      message, data = *block.call if block
-      data ||= {}
+      message, context = *block.call if block
+      context ||= {}
 
-      data = @context.merge(data)
-      data[:message] ||= message
+      context = @channel_context.merge(context)
+      context[:message] ||= message
 
-      return write(severity, data) if @logdev
+      check_invalid_keys(context)
 
-      @channel.add(severity, nil, progname, data) if @channel
+      return write(severity, context) if @logdev
+
+      @channel.add(severity, nil, progname, context) if @channel
     end
 
     def []=(key, val)
-      @context[key] = val
+      @channel_context[key] = val
     end
 
     def [](key)
-      @context[key]
+      @channel_context[key]
     end
 
     def delete(key)
-      @context.delete(key)
+      @channel_context.delete(key)
     end
 
-    def clear_context
-      @context = {}
+    def clear_channel_context
+      @channel_context = {}
     end
 
-    def subchannel(name)
+    def channel(name)
       sc = self.class.new(self)
       sc.level = @level
-      subchannel_name = name
-      subchannel_name = "#{self[:subchannel]} => #{name}" if self[:subchannel]
-      sc[:subchannel] = subchannel_name
+      channel_name = name
+      channel_name = "#{self[:channel]} => #{name}" if self[:channel]
+      sc[:channel] = channel_name
       sc
     end
 
@@ -81,14 +86,14 @@ module Hedgelog
       predicate = "#{level}?".to_sym
       level = level.to_sym
 
-      define_method(level) do |message = nil, data = {}, &block|
-        raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) requires at least 1 argument or a block" if !message && !block
-        raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) requires either a message OR a block" if message && block
-        raise ::ArgumentError, "#{self.class}##{level}(message, data={}, &block) data was a #{data.class}, it must be a Hash" unless data.is_a?(Hash)
+      define_method(level) do |message = nil, context = {}, &block|
+        raise ::ArgumentError, "#{self.class}##{level} requires at least 1 argument or a block" if !message && !block
+        raise ::ArgumentError, "#{self.class}##{level} requires either a message OR a block" if message && block
+        raise ::ArgumentError, "#{self.class}##{level} context is a #{context.class}, it must be a Hash" unless context.is_a?(Hash)
 
         return true unless send(predicate)
 
-        add(level_to_int(level), message, nil, data, &block)
+        add(level_to_int(level), message, nil, context, &block)
       end
 
       define_method(predicate) do
@@ -108,16 +113,32 @@ module Hedgelog
       level.to_sym
     end
 
-    def write(severity, data)
+    def check_invalid_keys(context)
+      invalid_keys = RESERVED_KEYS & context.keys
+      raise ::ArgumentError, "#{self.class}: The following keys are reserved and cannot be used #{invalid_keys.to_a}." if invalid_keys.length > 0
+    end
+
+    def write(severity, context)
       return true if @logdev.nil?
 
-      data = @scrubber.scrub(data)
-      data.merge!(
+      context = @scrubber.scrub(context)
+      context.merge!(
         timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
         level: level_from_int(severity)
       )
-      data[:caller] = debugharder(caller[3]) if debug?
+      context[:caller] = debugharder(caller[3]) if debug?
+
+      data = extract_top_level_keys(context)
       @logdev.write(Yajl::Encoder.encode(data) + "\n")
+    end
+
+    def extract_top_level_keys(context)
+      data = {}
+      TOP_LEVEL_KEYS.each do |key|
+        data[key] = context.delete(key) if context.key? key
+      end
+      data[:context] = context
+      data
     end
 
     def debugharder(callinfo)
