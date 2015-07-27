@@ -1,4 +1,5 @@
 require 'hedgelog/version'
+require 'hedgelog/context'
 require 'hedgelog/scrubber'
 require 'logger'
 require 'yajl'
@@ -12,18 +13,18 @@ class Hedgelog
     h[i] = v.downcase.to_sym
   end.freeze
 
-  TOP_LEVEL_KEYS = Set.new([:app, :channel, :level, :level_name, :message, :request_id, :timestamp]).freeze
-  RESERVED_KEYS = Set.new([:app, :level, :level_name, :timestamp, :context, :caller]).freeze
+  TOP_LEVEL_KEYS = [:app, :channel, :level, :level_name, :message, :request_id, :timestamp]
+  RESERVED_KEYS = [:app, :level, :level_name, :timestamp, :context, :caller]
 
   TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N'.freeze
   BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
   def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
-    @channel_context = {}
+    @channel_context = Hedgelog::Context.new(@scrubber)
     @level = LEVELS[:debug]
     @channel = nil
     @logdev = nil
-    @scrubber = Scrubber.new
+    @scrubber = Hedgelog::Scrubber.new
 
     if logdev.is_a?(self.class)
       @channel = logdev
@@ -39,17 +40,15 @@ class Hedgelog
     @level = level
   end
 
-  def add(severity, message = nil, progname = nil, context = {}, &block)
-    severity ||= LEVELS[:unknown]
+  def add(severity = LEVELS[:unknown], message = nil, progname = nil, context, &block)
     return true if (@logdev.nil? && @channel.nil?) || severity < @level
 
     message, context = *block.call if block
     context ||= {}
 
-    context = @channel_context.merge(context)
+    context = Hedgelog::Context.new(@scrubber, context) unless context.is_a? Hedgelog::Context
+    context.overwrite!(@channel_context)
     context[:message] ||= message
-
-    check_invalid_keys(context)
 
     return write(severity, context) if @logdev
 
@@ -120,15 +119,16 @@ class Hedgelog
   def write(severity, context)
     return true if @logdev.nil?
 
-    context = @scrubber.scrub(context)
-    context.merge!(
+    context.scrub!
+
+    data = context.merge(
       timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
       level_name: level_from_int(severity),
       level: severity
     )
-    context[:caller] = debugharder(caller[3]) if debug?
+    data[:caller] = debugharder(caller[3]) if debug?
+    data = extract_top_level_keys(data)
 
-    data = extract_top_level_keys(context)
     @logdev.write(Yajl::Encoder.encode(data) + "\n")
   end
 

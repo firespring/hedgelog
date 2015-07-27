@@ -122,7 +122,7 @@ describe Hedgelog do
       end
 
       it 'calls .add recursively on the channel' do
-        expect(logger).to receive(:add).with(severity, nil, nil, channel: :channel, message: 'Foo')
+        expect(logger).to receive(:add).with(severity, nil, nil, anything)
         subject
       end
     end
