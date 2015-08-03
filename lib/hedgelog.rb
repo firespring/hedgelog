@@ -111,11 +111,6 @@ class Hedgelog
     level.to_sym
   end
 
-  def check_invalid_keys(context)
-    invalid_keys = RESERVED_KEYS & context.keys
-    raise ::ArgumentError, "#{self.class}: The following keys are reserved and cannot be used #{invalid_keys.to_a}." if invalid_keys.length > 0
-  end
-
   def write(severity, context)
     return true if @logdev.nil?
 
