@@ -32,14 +32,14 @@ logger.debug "Foo"
 # No Output
 
 logger.info "Foo"
-=> {"message":"FOO","timestamp":"2015-07-15T12:03:08.257356","level":"info"}
+=> {"message":"FOO","timestamp":"2015-07-15T12:03:08.257356","level_name":"info","level":1}
 
 logger.info "FOO", sample: 'data'
-=> {"sample":"data","message":"FOO","timestamp":"2015-07-15T12:05:02.302202","level":"info"}
+=> {"context": {"sample":"data"},"message":"FOO","timestamp":"2015-07-15T12:05:02.302202","level_name":"info","level":1}
 
 # It also supports logging as a block with extra data
 logger.info { ["FOO", {sample: 'data'}] }
-=> {"sample":"data","message":"FOO","timestamp":"2015-07-15T12:06:20.026807","level":"info"}
+=> {"context", {"sample":"data"},"message":"FOO","timestamp":"2015-07-15T12:06:20.026807","level_name":"info","level":1}
 ```
 
 ## Context
@@ -50,7 +50,7 @@ Hedgelog allows adding additional context to an instance of a logger that will g
 logger[:request_id] = 1234
 => 1234
 logger.info "FOO"
-=> {"request_id":1234,"message":"FOO","timestamp":"2015-07-15T12:09:33.129984","level":"info"}
+=> {"request_id":1234,"message":"FOO","timestamp":"2015-07-15T12:09:33.129984","level_name":"info","level":1}
 ```
 
 ## Sub-channels
@@ -62,11 +62,11 @@ Sub-channels can have their own context separate from the main loggers context. 
 ```ruby
 subchannel = logger.subchannel(:database)
 subchannel.info "FOO"
-=> {"subchannel":"database","message":"FOO","timestamp":"2015-07-15T12:12:39.147210","level":"info"}
+=> {"subchannel":"database","message":"FOO","timestamp":"2015-07-15T12:12:39.147210","level_name":"info","level":1}
 
 # The subchannel does not effect the primary instance of the logger
 logger.info "FOO"
-=>{"message":"FOO","timestamp":"2015-07-15T12:13:31.132059","level":"info"}
+=>{"message":"FOO","timestamp":"2015-07-15T12:13:31.132059","level_name":"info","level":1}
 ```
 
 The sub-channel instances conform to the same interface as Hedgelog. Therefore they can be passed in as standard Ruby loggers to gems that take an instance of Ruby logger for input.
