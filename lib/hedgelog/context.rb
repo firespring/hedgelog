@@ -45,6 +45,7 @@ class Hedgelog
 
     def scrub!
       @data = @scrubber.scrub(@data)
+      self
     end
 
     def to_h
