@@ -5,4 +5,5 @@ gemspec
 
 group :development do
   gem 'ruby-prof'
+  gem 'guard-rspec', require: false
 end
