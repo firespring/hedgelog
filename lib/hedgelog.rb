@@ -47,7 +47,7 @@ class Hedgelog
     context ||= {}
 
     context = Hedgelog::Context.new(@scrubber, context) unless context.is_a? Hedgelog::Context
-    context.overwrite!(@channel_context)
+    context.merge!(@channel_context)
     context[:message] ||= message
 
     return write(severity, context) if @logdev
