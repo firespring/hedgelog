@@ -144,6 +144,25 @@ describe Hedgelog do
     end
   end
 
+  describe 'app' do
+    context 'when app is set' do
+      let(:logger) do
+        logger = Hedgelog.new(log_dev)
+        logger.app = 'test_app'
+        logger
+      end
+
+      it 'logs the app name with each log message' do
+        expect(subject).to include('app' => 'test_app')
+      end
+    end
+    context 'when app is not set' do
+      it 'does not include app in the log message' do
+        expect(subject.key?('app')).to be false
+      end
+    end
+  end
+
   describe 'context' do
     context 'with context set on the channel' do
       before :each do

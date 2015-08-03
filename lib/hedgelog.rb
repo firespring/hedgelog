@@ -24,6 +24,7 @@ class Hedgelog
     @level = LEVELS[:debug]
     @channel = nil
     @logdev = nil
+    @app = nil
     @scrubber = Hedgelog::Scrubber.new
 
     if logdev.is_a?(self.class)
@@ -39,6 +40,8 @@ class Hedgelog
     level = level_to_int(level)
     @level = level
   end
+
+  attr_writer :app
 
   def add(severity = LEVELS[:unknown], message = nil, progname = nil, context, &block)
     return true if (@logdev.nil? && @channel.nil?) || severity < @level
@@ -121,6 +124,7 @@ class Hedgelog
       level_name: level_from_int(severity),
       level: severity
     )
+    data[:app] = @app if @app
     data[:caller] = debugharder(caller[3]) if debug?
     data = extract_top_level_keys(data)
 
