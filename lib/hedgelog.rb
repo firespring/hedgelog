@@ -37,8 +37,9 @@ class Hedgelog
   attr_reader :level
 
   def level=(level)
-    level = level_to_int(level)
-    @level = level
+    int_level = level_to_int(level)
+    raise ::ArgumentError, "#{self.class}#level= , #{level} is not a valid level." if int_level.nil?
+    @level = int_level
   end
 
   attr_writer :app
