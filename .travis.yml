@@ -5,3 +5,17 @@ rvm:
 script:
   - bundle exec rspec
   - bundle exec rubocop
+deploy:
+  - provider: releases
+    api_key:
+      secure: Ob2+ZdkM5msawA9FnJ8hk7wLgUP9tJg+gOIs1VOpOzq7cqHUmbK2tGwJPSWX+yzFA5A9o520SLJB0MAfnO78DjByRenH1e8keg0uxZ17ci8FDWEPhF53cCjuTLhsaC9qxVcbNps4Z8pg5lQ/0IPaef0lVX0u2jPEHagNBmfJdYLthUPH/M/AcoVT/chjxWw3SNON4LdcUQw5qtpMUe/Clroi5LaaYPWui0o7z6EmlqwV0gFd5oVkXabwuMkWU06tFzxO+AgBT7qeMCDSXqa2ODaWItE74i8TVEMRDHiY+0a0gs76xjsfkml4Q0dNw8YuKcO4p25QskNeTtxi3rZoMToG4e8MfHZG+3YLu3u9VKp0fR7WsL21Jf27dDscXapXyVcMZ+AcklRMEGmKjsyKPnxepcR5RtmoVbDY9/SnJfECa62diZyzMYpjDvu4ZVut5vf/m8AvhnotpwTE2Nilb268f36uIloTG/5zrA113KiEAw5OW0abOm0JFn7t2bZty9D1rwyXiUGZmeS+ZFFE0+zCKXFv5VyK9ZmG4OKbGMMQJRsF+ej70Uv88MbwSS8TDRu0U1bnHBQ6aP3Wc7POihk9M2NAokFppQ9R0htVm0XWrDsxWnEqMMf8HZAQ8fsM9P1jZclgJKnzdSqpKjW4cGAk9i5+mepG6BcASfoUkhk=
+    file: hedgelog*.gem
+    on:
+      repo: firespring/hedgelog
+  - provider: rubygems
+    api_key:
+      secure: 0lJg8R4FfcC/V0CQP1+MtvaOTHumMczV6W5wNvW+S4C9A+EhWgNdZDZ1tPbLQDRm4rBhr15k6KpZUmR1hMiu2xpN/O9wpdLqrhFccnP8+3qSYWi4Mqns/lFLQtVwlfQeSjQPejHeel7wEDAo/iFs9lgVzyXtusAgIZ8qQLJIa2T8cLE5Kdh/xfJTfdYCojJkw+5XoxARFmiXz5dIBb+1jiYmAULgRQpNUifz+IspAUxDf8BXjZFi7TZeKf34kOnVRUXLdjFOkTIXSx7F1NlSCFUmQtjf1Ft1PfJUwZ+eh5B0u5AL7JMA3pA9T6WNpqJpedVCD5KvkqKeILYFkYriro7K41MCPXBM4CAXSgpqnwiGCR64eBm85nGaRbYIZ+8AdGKxd1wS+fVkpOv4PxDADDD+qPIVTpuTeIJ2+hZYpHdsD5bYtqhvqdUkVOdilnBZKFYHVwHZvkObOoGyk0g3PzwYOUSnG3BJ3YhinTzNuXkOBhUdGN/eZna314hPLVGySTlmpnnof2lWQFArJXTcJXVQBdkSdlML7vvv4QjttOBNX6ICzOimFDrTDIlf3hkrf3+bGva3v0tBn3cz4bLOZgdvWrhhJ+p6TzPCGoseKUE2e+zvBAsPEzjYI9G+hKkSbtT0rFZ6O/Cr21dL/Mbf2WMz0NfhmTc4J3kdP2Y98Ow=
+    gem: hedgelog
+    on:
+      tags: true
+      repo: firespring/hedgelog
