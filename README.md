@@ -1,4 +1,5 @@
 # Hedgelog
+[![Build Status](https://travis-ci.org/firespring/hedgelog.svg)](https://travis-ci.org/firespring/hedgelog)
 
 This gem provides an opinionated Ruby logger for writing structured JSON logs. It attempts to maintain compatibility with the standard Ruby logger api while extending it with functionality relevant to JSON logging.
 
