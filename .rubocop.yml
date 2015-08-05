@@ -37,6 +37,9 @@ Documentation:
 Next:
   Enabled: false
 
+OptionalArguments:
+  Enabled: false
+
 SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
