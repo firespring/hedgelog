@@ -34,13 +34,15 @@ class Hedgelog
     def merge!(hash_or_context)
       check_reserved_keys(hash_or_context) unless hash_or_context.is_a? Hedgelog::Context
 
-      @data = hash_or_context.to_h.merge(@data)
+      hash_or_context = hash_or_context.to_h if hash_or_context.respond_to?(:to_h)
+      @data = hash_or_context.merge(@data)
     end
 
     def overwrite!(hash_or_context)
       check_reserved_keys(hash_or_context) unless hash_or_context.is_a? Hedgelog::Context
 
-      @data.merge!(hash_or_context.to_h)
+      hash_or_context = hash_or_context.to_h if hash_or_context.respond_to?(:to_h)
+      @data.merge!(hash_or_context)
     end
 
     def scrub!
