@@ -79,6 +79,6 @@ DataMapper.logger = logger.subchannel(:database)
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/hedgelog.
+Bug reports and pull requests are welcome on GitHub at https://github.com/firespring/hedgelog.
 
 For details on the pull request process please see our [contributing documentation](CONTRIBUTING.md)
