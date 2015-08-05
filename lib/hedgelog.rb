@@ -120,16 +120,20 @@ class Hedgelog
 
     context.scrub!
 
-    data = context.merge(
-      timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
-      level_name: level_from_int(severity),
-      level: severity
-    )
+    data = context.merge(default_data(severity))
     data[:app] = @app if @app
     data[:caller] = debugharder(caller[3]) if debug?
     data = extract_top_level_keys(data)
 
     @logdev.write(Yajl::Encoder.encode(data) + "\n")
+  end
+
+  def default_data(severity)
+    {
+      timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
+      level_name: level_from_int(severity),
+      level: severity
+    }
   end
 
   def extract_top_level_keys(context)
