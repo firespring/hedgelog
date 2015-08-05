@@ -1,4 +1,5 @@
 language: ruby
+cache: bundler
 rvm:
   - 2.2.2
   - 1.9.3
@@ -13,6 +14,7 @@ deploy:
     file: hedgelog-*.gem
     on:
       tags: true
+      rvm: 2.2.2
       repo: firespring/hedgelog
   - provider: rubygems
     api_key:
@@ -20,4 +22,5 @@ deploy:
     gem: hedgelog
     on:
       tags: true
+      rvm: 2.2.2
       repo: firespring/hedgelog
