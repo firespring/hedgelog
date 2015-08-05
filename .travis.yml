@@ -11,6 +11,7 @@ deploy:
       secure: Ob2+ZdkM5msawA9FnJ8hk7wLgUP9tJg+gOIs1VOpOzq7cqHUmbK2tGwJPSWX+yzFA5A9o520SLJB0MAfnO78DjByRenH1e8keg0uxZ17ci8FDWEPhF53cCjuTLhsaC9qxVcbNps4Z8pg5lQ/0IPaef0lVX0u2jPEHagNBmfJdYLthUPH/M/AcoVT/chjxWw3SNON4LdcUQw5qtpMUe/Clroi5LaaYPWui0o7z6EmlqwV0gFd5oVkXabwuMkWU06tFzxO+AgBT7qeMCDSXqa2ODaWItE74i8TVEMRDHiY+0a0gs76xjsfkml4Q0dNw8YuKcO4p25QskNeTtxi3rZoMToG4e8MfHZG+3YLu3u9VKp0fR7WsL21Jf27dDscXapXyVcMZ+AcklRMEGmKjsyKPnxepcR5RtmoVbDY9/SnJfECa62diZyzMYpjDvu4ZVut5vf/m8AvhnotpwTE2Nilb268f36uIloTG/5zrA113KiEAw5OW0abOm0JFn7t2bZty9D1rwyXiUGZmeS+ZFFE0+zCKXFv5VyK9ZmG4OKbGMMQJRsF+ej70Uv88MbwSS8TDRu0U1bnHBQ6aP3Wc7POihk9M2NAokFppQ9R0htVm0XWrDsxWnEqMMf8HZAQ8fsM9P1jZclgJKnzdSqpKjW4cGAk9i5+mepG6BcASfoUkhk=
     file: hedgelog*.gem
     on:
+      tags: true
       repo: firespring/hedgelog
   - provider: rubygems
     api_key:
