@@ -56,26 +56,26 @@ logger.info "FOO"
 => {"request_id":1234,"message":"FOO","timestamp":"2015-07-15T12:09:33.129984","level_name":"info","level":1}
 ```
 
-## Sub-channels
+## Channels
 
-One of the primary features of Hedgelog is the usage of sub-channels.
+One of the primary features of Hedgelog is the usage of channels.
 
-Sub-channels can have their own context separate from the main loggers context. This allows including additional information for all log messages from a portion of your application.
+Channels can have their own context separate from the main loggers context. This allows including additional information for all log messages from a portion of your application.
 
 ```ruby
-subchannel = logger.subchannel(:database)
-subchannel.info "FOO"
-=> {"subchannel":"database","message":"FOO","timestamp":"2015-07-15T12:12:39.147210","level_name":"info","level":1}
+channel = logger.channel(:database)
+channel.info "FOO"
+=> {"channel":"database","message":"FOO","timestamp":"2015-07-15T12:12:39.147210","level_name":"info","level":1}
 
-# The subchannel does not effect the primary instance of the logger
+# The channel does not effect the primary instance of the logger
 logger.info "FOO"
 =>{"message":"FOO","timestamp":"2015-07-15T12:13:31.132059","level_name":"info","level":1}
 ```
 
-The sub-channel instances conform to the same interface as Hedgelog. Therefore they can be passed in as standard Ruby loggers to gems that take an instance of Ruby logger for input.
+The channel instances conform to the same interface as Hedgelog. Therefore they can be passed in as standard Ruby loggers to gems that take an instance of Ruby logger for input.
 
 ```ruby
-DataMapper.logger = logger.subchannel(:database)
+DataMapper.logger = logger.channel(:database)
 ```
 
 ## Scrubbing
