@@ -2,6 +2,7 @@
 [![Gem Version](https://badge.fury.io/rb/hedgelog.svg)](http://badge.fury.io/rb/hedgelog)
 [![Build Status](https://travis-ci.org/firespring/hedgelog.svg?branch=master)](https://travis-ci.org/firespring/hedgelog)
 [![Dependency Status](https://gemnasium.com/firespring/hedgelog.svg)](https://gemnasium.com/firespring/hedgelog)
+[![Code Climate](https://codeclimate.com/github/firespring/hedgelog/badges/gpa.svg)](https://codeclimate.com/github/firespring/hedgelog)
 
 This gem provides an opinionated Ruby logger for writing structured JSON logs. It attempts to maintain compatibility with the standard Ruby logger api while extending it with functionality relevant to JSON logging.
 
