@@ -16,7 +16,7 @@ class Hedgelog
   TOP_LEVEL_KEYS = [:app, :channel, :level, :level_name, :message, :request_id, :timestamp]
   RESERVED_KEYS = [:app, :level, :level_name, :timestamp, :context, :caller]
 
-  TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N'.freeze
+  TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N%z'.freeze
   BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
   def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
