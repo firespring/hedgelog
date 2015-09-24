@@ -51,3 +51,7 @@ TrivialAccessors:
 
 BlockNesting:
   Max: 4
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
