@@ -268,11 +268,11 @@ describe Hedgelog do
       let(:message) { 'log message' }
 
       context 'when in debug mode' do
-        it 'is not be more than 8x slower than standard ruby logger' do
+        it 'is not be more than 9x slower than standard ruby logger' do
           standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.debug(message) } }
           hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.debug(message) } }
 
-          expect(hedgelog_benchmark).to be <= standard_benchmark * 8
+          expect(hedgelog_benchmark).to be <= standard_benchmark * 9
         end
       end
 
@@ -288,11 +288,11 @@ describe Hedgelog do
           logger
         end
 
-        it 'is not be more than 4x slower than standard ruby logger' do
+        it 'is not be more than 5x slower than standard ruby logger' do
           standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.info(message) } }
           hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.info(message) } }
 
-          expect(hedgelog_benchmark).to be <= standard_benchmark * 4
+          expect(hedgelog_benchmark).to be <= standard_benchmark * 5
         end
       end
     end

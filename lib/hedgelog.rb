@@ -13,8 +13,8 @@ class Hedgelog
     h[i] = v.downcase.to_sym
   end.freeze
 
-  TOP_LEVEL_KEYS = [:app, :channel, :level, :level_name, :message, :request_id, :timestamp]
-  RESERVED_KEYS = [:app, :level, :level_name, :timestamp, :context, :caller]
+  TOP_LEVEL_KEYS = [:app, :channel, :level, :level_name, :message, :request_id, :timestamp].freeze
+  RESERVED_KEYS = [:app, :level, :level_name, :timestamp, :context, :caller].freeze
 
   TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N%z'.freeze
   BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
@@ -47,7 +47,7 @@ class Hedgelog
   def add(severity = LEVELS[:unknown], message = nil, progname = nil, context, &block)
     return true if (@logdev.nil? && @channel.nil?) || severity < @level
 
-    message, context = *block.call if block
+    message, context = *yield if block
     context ||= {}
 
     context = Hedgelog::Context.new(@scrubber, context) unless context.is_a? Hedgelog::Context
@@ -150,13 +150,13 @@ class Hedgelog
     return unless m
     path, line, method = m[1..3]
     whence = $LOAD_PATH.find { |p| path.start_with?(p) }
-    if whence
-      # Remove the RUBYLIB path portion of the full file name
-      file = path[whence.length + 1..-1]
-    else
-      # We get here if the path is not in $:
-      file = path
-    end
+    file = if whence
+             # Remove the RUBYLIB path portion of the full file name
+             path[whence.length + 1..-1]
+           else
+             # We get here if the path is not in $:
+             path
+           end
 
     {
       file: file,

@@ -84,7 +84,9 @@ describe Hedgelog::Context do
     context 'with valid keys in the hash' do
       it 'updates the context with the merged data' do
         expect(instance[:foo]).to eq 'bar'
+        # rubocop:disable Performance/RedundantMerge
         instance.merge!(baz: 'qux')
+        # rubocop:enable Performance/RedundantMerge
         expect(instance.to_h).to include(foo: 'bar', baz: 'qux')
       end
     end
@@ -92,7 +94,9 @@ describe Hedgelog::Context do
     context 'with existing, valid keys in the hash' do
       it 'updates the context with the merged data' do
         expect(instance[:foo]).to eq 'bar'
+        # rubocop:disable Performance/RedundantMerge
         instance.merge!(foo: 'qux')
+        # rubocop:enable Performance/RedundantMerge
         expect(instance.to_h).to include(foo: 'bar')
       end
     end
