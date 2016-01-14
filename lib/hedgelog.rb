@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'hedgelog/version'
 require 'hedgelog/context'
 require 'hedgelog/scrubber'
