@@ -17,7 +17,7 @@ class Hedgelog
 
     def scrub_hash(hash)
       hash.each do |key, val|
-        next hash[key] = @replacement if key.to_s.downcase == @key.to_s.downcase
+        next hash[key] = @replacement if key.to_s.casecmp(@key.to_s).zero?
         scrub_thing(val)
       end
     end
