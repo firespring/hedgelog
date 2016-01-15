@@ -127,6 +127,7 @@ class Hedgelog
     data = extract_top_level_keys(data)
 
     @logdev.write(Yajl::Encoder.encode(data) + "\n")
+    true
   end
 
   def default_data(severity)
