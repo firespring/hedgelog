@@ -58,7 +58,7 @@ class Hedgelog
 
     def check_reserved_keys(hash)
       invalid_keys = Hedgelog::RESERVED_KEYS & hash.keys
-      raise ::ArgumentError, "#{self.class}: The following keys are reserved and cannot be used #{invalid_keys.to_a}." if invalid_keys.length > 0
+      raise ::ArgumentError, "#{self.class}: The following keys are reserved and cannot be used #{invalid_keys.to_a}." unless invalid_keys.empty?
     end
   end
 end
