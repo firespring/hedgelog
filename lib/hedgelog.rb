@@ -45,7 +45,7 @@ class Hedgelog
 
   attr_writer :app
 
-  def add(severity = LEVELS[:unknown], message = nil, progname = nil, context, &block)
+  def add(severity = LEVELS[:unknown], message = nil, progname = nil, context = {}, &block)
     return true if (@logdev.nil? && @channel.nil?) || severity < @level
 
     message, context = *yield if block

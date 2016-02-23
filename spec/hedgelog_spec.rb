@@ -113,6 +113,21 @@ describe Hedgelog do
       end
     end
 
+    context 'when logging with only a severity' do
+      subject do
+        logger = Hedgelog.new(log_dev)
+        logger.level = log_level
+        logger.add(severity) { message }
+      end
+      let(:log_level) { Logger::DEBUG }
+
+      it 'sets the appropriate level on the log' do
+        subject
+        expect(JSON.parse(log_results)).to include('message' => message)
+        expect(JSON.parse(log_results)).to include('level' => severity)
+      end
+    end
+
     context 'when logging to a channel' do
       let(:logger) { Hedgelog.new(log_dev) }
       subject do
