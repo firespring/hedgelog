@@ -10,6 +10,7 @@ group :test, :development do
   gem "simplecov", "~> 0.10"
   gem "rubocop", "~> 0.33"
   gem "timecop"
+  gem 'benchmark-ips'
 end
 
 group :development do

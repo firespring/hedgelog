@@ -1,6 +1,6 @@
 require 'spec_helper'
 require 'timecop'
-require 'benchmark'
+require 'benchmark/ips'
 require 'json'
 
 describe Hedgelog do
@@ -283,11 +283,16 @@ describe Hedgelog do
       let(:message) { 'log message' }
 
       context 'when in debug mode' do
-        it 'is not be more than 9x slower than standard ruby logger' do
-          standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.debug(message) } }
-          hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.debug(message) } }
+        it 'is not be more than 12x slower than standard ruby logger' do
+          report = Benchmark.ips(quiet: true) do |bm|
+            bm.config(time: 5, warmup: 2)
+            bm.report('standard_logger') { standard_logger.debug(message) }
+            bm.report('hedgelog_logger') { hedgelog_logger.debug(message) }
+          end
 
-          expect(hedgelog_benchmark).to be <= standard_benchmark * 9
+          standard_benchmark, hedgelog_benchmark = *report.entries
+
+          expect(hedgelog_benchmark.ips).to be > (standard_benchmark.ips / 12)
         end
       end
 
@@ -304,10 +309,15 @@ describe Hedgelog do
         end
 
         it 'is not be more than 5x slower than standard ruby logger' do
-          standard_benchmark = Benchmark.realtime { 1000.times { standard_logger.info(message) } }
-          hedgelog_benchmark = Benchmark.realtime { 1000.times { hedgelog_logger.info(message) } }
+          report = Benchmark.ips(quiet: true) do |bm|
+            bm.config(time: 5, warmup: 2)
+            bm.report('standard_logger') { standard_logger.debug(message) }
+            bm.report('hedgelog_logger') { hedgelog_logger.debug(message) }
+          end
 
-          expect(hedgelog_benchmark).to be <= standard_benchmark * 5
+          standard_benchmark, hedgelog_benchmark = *report.entries
+
+          expect(hedgelog_benchmark.ips).to be > (standard_benchmark.ips / 5)
         end
       end
     end
