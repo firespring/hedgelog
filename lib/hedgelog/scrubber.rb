@@ -4,7 +4,7 @@ class Hedgelog
   class Scrubber
     def initialize(replacements = nil)
       @replacements = replacements || [
-        ScrubReplacement.new('pasword', '**********')
+        ScrubReplacement.new('password', '**********')
       ]
     end
 
