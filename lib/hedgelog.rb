@@ -21,12 +21,12 @@ class Hedgelog
   BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
   def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
-    @channel_context = Hedgelog::Context.new(@scrubber)
     @level = LEVELS[:debug]
     @channel = nil
     @logdev = nil
     @app = nil
     @scrubber = Hedgelog::Scrubber.new
+    @channel_context = Hedgelog::Context.new(@scrubber)
 
     if logdev.is_a?(self.class)
       @channel = logdev
