@@ -7,7 +7,7 @@ class Hedgelog
     end
   
     def normalize_struct(struct)
-      return Hash[struct.each_pair.to_a]
+      normalize_hash(Hash[struct.each_pair.to_a])
     end
 
     def normalize_hash(hash)
@@ -17,9 +17,7 @@ class Hedgelog
     end
 
     def normalize_array(array)
-      array.map do |val|
-        normalize_thing(val)
-      end
+      array.to_json
     end
 
     private
@@ -29,7 +27,6 @@ class Hedgelog
       return normalize_struct(thing) if thing.is_a?(Struct)
       return normalize_array(thing) if thing.is_a?(Array)
       return normalize_hash(thing) if thing.is_a?(Hash)
-      return thing if thing.is_a?(String) || thing.is_a?(Float) || thing.is_a?(Fixnum)
       thing
     end
   end
