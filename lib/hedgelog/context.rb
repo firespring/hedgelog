@@ -8,7 +8,7 @@ class Hedgelog
       check_reserved_keys(data)
       @data = data
       @scrubber = scrubber
-      @normalizer = normalizer 
+      @normalizer = normalizer
     end
 
     def []=(key, val)
