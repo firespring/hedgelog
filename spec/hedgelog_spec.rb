@@ -311,8 +311,8 @@ describe Hedgelog do
         it 'is not be more than 5x slower than standard ruby logger' do
           report = Benchmark.ips(quiet: true) do |bm|
             bm.config(time: 5, warmup: 2)
-            bm.report('standard_logger') { standard_logger.debug(message) }
-            bm.report('hedgelog_logger') { hedgelog_logger.debug(message) }
+            bm.report('standard_logger') { standard_logger.info(message) }
+            bm.report('hedgelog_logger') { hedgelog_logger.info(message) }
           end
 
           standard_benchmark, hedgelog_benchmark = *report.entries
