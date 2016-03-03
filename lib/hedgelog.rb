@@ -2,6 +2,7 @@
 require 'hedgelog/version'
 require 'hedgelog/context'
 require 'hedgelog/scrubber'
+require 'hedgelog/normalizer'
 require 'logger'
 require 'yajl'
 
@@ -26,7 +27,8 @@ class Hedgelog
     @logdev = nil
     @app = nil
     @scrubber = Hedgelog::Scrubber.new
-    @channel_context = Hedgelog::Context.new(@scrubber)
+    @normalizer = Hedgelog::Normalizer.new
+    @channel_context = Hedgelog::Context.new(@scrubber, @normalizer)
 
     if logdev.is_a?(self.class)
       @channel = logdev
@@ -51,7 +53,7 @@ class Hedgelog
     message, context = *yield if block
     context ||= {}
 
-    context = Hedgelog::Context.new(@scrubber, context) unless context.is_a? Hedgelog::Context
+    context = Hedgelog::Context.new(@scrubber, @normalizer, context) unless context.is_a? Hedgelog::Context
     context.merge!(@channel_context)
     context[:message] ||= message
 
@@ -119,6 +121,7 @@ class Hedgelog
   def write(severity, context)
     return true if @logdev.nil?
 
+    context.normalize!
     context.scrub!
 
     data = context.merge(default_data(severity))

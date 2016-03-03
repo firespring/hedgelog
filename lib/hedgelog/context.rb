@@ -1,12 +1,14 @@
 require 'hedgelog/scrubber'
+require 'hedgelog/normalizer'
 
 class Hedgelog
   class Context
-    def initialize(scrubber, data = {})
+    def initialize(scrubber, normalizer, data = {})
       raise ::ArgumentError, "#{self.class}: argument must be Hash got #{data.class}." unless data.is_a? Hash
       check_reserved_keys(data)
       @data = data
       @scrubber = scrubber
+      @normalizer = normalizer
     end
 
     def []=(key, val)
@@ -47,6 +49,11 @@ class Hedgelog
 
     def scrub!
       @data = @scrubber.scrub(@data)
+      self
+    end
+
+    def normalize!
+      @data = @normalizer.normalize(@data)
       self
     end
 
