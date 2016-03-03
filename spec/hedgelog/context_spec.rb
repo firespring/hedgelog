@@ -137,9 +137,17 @@ describe Hedgelog::Context do
     end
   end
 
+  describe '#normalize!' do
+    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    it 'normalizes the data' do
+      expect(dummy_normalizer).to receive(:normalize).with(foo: 'bar')
+      subject.normalize!
+    end
+  end
+
   describe 'to_h' do
     subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
-    it 'returnst he data as a hash' do
+    it 'returns the data as a hash' do
       expect(instance.to_h).to include(foo: 'bar')
     end
   end
