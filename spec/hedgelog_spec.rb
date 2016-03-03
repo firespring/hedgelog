@@ -286,34 +286,6 @@ describe Hedgelog do
       hedgelog_logger.level = level
     end
 
-    shared_examples 'a debug benchmark' do |performance|
-      it "is not be more than #{performance}x slower than standard ruby logger" do
-        report = Benchmark.ips(quiet: true) do |bm|
-          bm.config(time: 5, warmup: 2)
-          bm.report('standard_logger') { standard_logger.debug(message) }
-          bm.report('hedgelog_logger') { hedgelog_logger.debug(*hedgelog_params) }
-        end
-
-        standard_benchmark, hedgelog_benchmark = *report.entries
-
-        expect(hedgelog_benchmark.ips).to be > (standard_benchmark.ips / performance)
-      end
-    end
-
-    shared_examples 'an info benchmark' do |performance|
-      it "is not be more than #{performance}x slower than standard ruby logger" do
-        report = Benchmark.ips(quiet: true) do |bm|
-          bm.config(time: 5, warmup: 2)
-          bm.report('standard_logger') { standard_logger.info(message) }
-          bm.report('hedgelog_logger') { hedgelog_logger.info(*hedgelog_params) }
-        end
-
-        standard_benchmark, hedgelog_benchmark = *report.entries
-
-        expect(hedgelog_benchmark.ips).to be > (standard_benchmark.ips / performance)
-      end
-    end
-
     shared_context 'logging with context' do
       let(:hash) { {message: 'dummy=1234'} }
       let(:array) { ['dummy string', {message: 'dummy=1234'}] }
@@ -331,21 +303,31 @@ describe Hedgelog do
     context 'when in debug mode' do
       let(:level) { Logger::DEBUG }
       context 'when logging a string' do
-        it_behaves_like 'a debug benchmark', 12
+        it 'is no more than 12x slower than the stdlib logger' do
+          expect { standard_logger.debug(message) }.to perform.times_slower(12).than { hedgelog_logger.debug(*hedgelog_params) }
+        end
       end
       context 'when logging with context' do
         include_context 'logging with context'
-        it_behaves_like 'a debug benchmark', 16
+
+        it 'is no more than 16x slower than the stdlib logger' do
+          expect { standard_logger.debug(message) }.to perform.times_slower(16).than { hedgelog_logger.debug(*hedgelog_params) }
+        end
       end
     end
     context 'when not in debug mode' do
       let(:level) { Logger::INFO }
       context 'when logging a string' do
-        it_behaves_like 'an info benchmark', 5
+        it 'is no more than 5x slower than the stdlib logger' do
+          expect { standard_logger.info(message) }.to perform.times_slower(5).than { hedgelog_logger.info(*hedgelog_params) }
+        end
       end
       context 'when logging with context' do
         include_context 'logging with context'
-        it_behaves_like 'an info benchmark', 12
+
+        it 'is no more than 12x slower than the stdlib logger' do
+          expect { standard_logger.info(message) }.to perform.times_slower(12).than { hedgelog_logger.info(*hedgelog_params) }
+        end
       end
     end
   end
