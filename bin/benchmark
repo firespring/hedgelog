@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "hedgelog"
+require 'benchmark/ips'
+require 'logger'
+
+logger = Hedgelog.new('/dev/null')
+logger.level = Logger::INFO
+
+stdlib_logger = Logger.new('/dev/null')
+stdlib_logger.level = Logger::INFO
+
+Benchmark.ips do |x|
+  x.config(:time => 5, :warmup => 2)
+  x.report("stdlib string") { stdlib_logger.info('Foo') }
+  x.report("stdlib block") { stdlib_logger.info {'Foo'} }
+  x.report("string") { logger.info('Foo') }
+  x.report("block") { logger.info {'Foo'} }
+  x.report("simple context") { logger.info {['Foo', {bar: 'baz'}]} }
+  x.report("nested context") { logger.info {['Foo', {bar: 'baz', 'bang': {password: 'qux'}}] } }
+  x.compare!
+end
