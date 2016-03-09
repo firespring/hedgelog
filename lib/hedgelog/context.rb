@@ -1,14 +1,10 @@
-require 'hedgelog/scrubber'
-require 'hedgelog/normalizer'
-
 class Hedgelog
   class Context
-    def initialize(scrubber, normalizer, data = {})
+    def initialize(transformer, data = {})
       raise ::ArgumentError, "#{self.class}: argument must be Hash got #{data.class}." unless data.is_a? Hash
       check_reserved_keys(data)
       @data = data
-      @scrubber = scrubber
-      @normalizer = normalizer
+      @transformer = transformer
     end
 
     def []=(key, val)
@@ -47,13 +43,8 @@ class Hedgelog
       @data.merge!(hash_or_context)
     end
 
-    def scrub!
-      @data = @scrubber.scrub(@data)
-      self
-    end
-
-    def normalize!
-      @data = @normalizer.normalize(@data)
+    def transform!
+      @data = @transformer.transform(@data)
       self
     end
 

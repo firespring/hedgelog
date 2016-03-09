@@ -1,12 +1,13 @@
 require 'spec_helper'
 require 'hedgelog/context'
 
-dummy_scrubber = Hedgelog::ScrubReplacement.new(:dummy, 'DUMMY')
-dummy_normalizer = Hedgelog::Normalizer.new
+dummy_scrubber = Hedgelog::Transforms::ScrubReplacement.new(:dummy, 'DUMMY')
+dummy_normalizer = Hedgelog::Transforms::Normalizer.new
+dummy_transformer = Hedgelog::Transformer.new(dummy_scrubber, dummy_normalizer)
 
 describe Hedgelog::Context do
   describe '#[]=' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, data) }
+    subject(:instance) { described_class.new(dummy_transformer, data) }
     subject(:instance_with_value) do
       instance[key] = val
       instance
@@ -30,7 +31,7 @@ describe Hedgelog::Context do
   end
 
   describe '#[]' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
 
     context 'when key is a valid key' do
       it 'sets the value on the context' do
@@ -45,7 +46,7 @@ describe Hedgelog::Context do
   end
 
   describe '#delete' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
 
     context 'when key is a valid key' do
       it 'deletes the key' do
@@ -63,7 +64,7 @@ describe Hedgelog::Context do
   end
 
   describe '#clear' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
     it 'clears the context' do
       expect(instance[:foo]).to eq 'bar'
       instance.clear
@@ -72,7 +73,7 @@ describe Hedgelog::Context do
   end
 
   describe '#merge' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
     it 'returns a merged hash of the context and the data' do
       expect(instance[:foo]).to eq 'bar'
       expect(instance.merge(baz: 'qux')).to include(foo: 'bar', baz: 'qux')
@@ -80,7 +81,7 @@ describe Hedgelog::Context do
   end
 
   describe '#merge' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
 
     context 'with valid keys in the hash' do
       it 'updates the context with the merged data' do
@@ -111,7 +112,7 @@ describe Hedgelog::Context do
   end
 
   describe '#overwrite!' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
 
     context 'with valid keys in the hash' do
       it 'replaces the context with new data, preserving keys that already exist' do
@@ -129,24 +130,16 @@ describe Hedgelog::Context do
     end
   end
 
-  describe '#scrub!' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+  describe '#transform!' do
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
     it 'scrubs the data' do
-      expect(dummy_scrubber).to receive(:scrub).with(foo: 'bar')
-      subject.scrub!
-    end
-  end
-
-  describe '#normalize!' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
-    it 'normalizes the data' do
-      expect(dummy_normalizer).to receive(:normalize).with(foo: 'bar')
-      subject.normalize!
+      expect(dummy_transformer).to receive(:transform).with(foo: 'bar')
+      subject.transform!
     end
   end
 
   describe 'to_h' do
-    subject(:instance) { described_class.new(dummy_scrubber, dummy_normalizer, foo: 'bar') }
+    subject(:instance) { described_class.new(dummy_transformer, foo: 'bar') }
     it 'returns the data as a hash' do
       expect(instance.to_h).to include(foo: 'bar')
     end

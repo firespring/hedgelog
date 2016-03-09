@@ -1,9 +1,9 @@
 require 'spec_helper'
-require 'hedgelog/scrub_replacement'
+require 'hedgelog/transforms/scrub_replacement'
 
-describe Hedgelog::ScrubReplacement do
+describe Hedgelog::Transforms::ScrubReplacement do
   describe '#scrub_string' do
-    subject { Hedgelog::ScrubReplacement.new(key, replacement).scrub_string(input) }
+    subject { described_class.new(key, replacement).scrub_string(input) }
     let(:key) { 'password' }
     let(:replacement) { '*****' }
 
@@ -53,7 +53,7 @@ describe Hedgelog::ScrubReplacement do
   end
 
   describe '#scrub_hash' do
-    subject { Hedgelog::ScrubReplacement.new(key, replacement).scrub_hash(input) }
+    subject { Hedgelog::Transforms::ScrubReplacement.new(key, replacement).scrub_hash(input) }
     let(:key) { 'password' }
     let(:replacement) { '*****' }
 
@@ -83,7 +83,7 @@ describe Hedgelog::ScrubReplacement do
   end
 
   describe '#scrub_array' do
-    subject { Hedgelog::ScrubReplacement.new(key, replacement).scrub_array(input) }
+    subject { Hedgelog::Transforms::ScrubReplacement.new(key, replacement).scrub_array(input) }
     let(:key) { 'password' }
     let(:replacement) { '*****' }
 

@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'hedgelog/normalizer'
+require 'hedgelog/transforms/normalizer'
 
 class CustomJSONObject
   def as_json
@@ -7,16 +7,16 @@ class CustomJSONObject
   end
 end
 
-describe Hedgelog::Normalizer do
+describe Hedgelog::Transforms::Normalizer do
   subject(:instance) { described_class.new }
   let(:struct_class) { Struct.new(:foo, :bar) }
   let(:struct) { struct_class.new(1234, 'dummy') }
   let(:hash) { {message: 'dummy=1234'} }
   let(:array) { ['dummy string', {message: 'dummy=1234'}] }
 
-  describe '#normalize' do
+  describe '#transform' do
     it 'returns the normalized data' do
-      expect(instance.normalize(hash)).to include(message: 'dummy=1234')
+      expect(instance.transform(hash)).to include(message: 'dummy=1234')
     end
 
     it 'does not modify external state' do
@@ -24,12 +24,12 @@ describe Hedgelog::Normalizer do
       orig_myvar = myvar.clone
 
       data = {foo: myvar}
-      instance.normalize(data)
+      instance.transform(data)
       expect(myvar).to eq orig_myvar
     end
 
     it 'uses an objects as_json method if available' do
-      expect(instance.normalize(foo: CustomJSONObject.new)).to include(foo: 'JSON')
+      expect(instance.transform(foo: CustomJSONObject.new)).to include(foo: 'JSON')
     end
   end
 
