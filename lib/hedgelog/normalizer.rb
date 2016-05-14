@@ -24,6 +24,7 @@ class Hedgelog
 
     def normalize_thing(thing)
       return '' if thing.nil?
+      thing = thing.as_json if thing.respond_to?(:as_json)
       return normalize_struct(thing) if thing.is_a?(Struct)
       return normalize_array(thing) if thing.is_a?(Array)
       return normalize_hash(thing) if thing.is_a?(Hash)

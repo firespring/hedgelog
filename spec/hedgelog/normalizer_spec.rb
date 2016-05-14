@@ -1,12 +1,19 @@
 require 'spec_helper'
 require 'hedgelog/normalizer'
 
+class CustomJSONObject
+  def as_json
+    'JSON'
+  end
+end
+
 describe Hedgelog::Normalizer do
   subject(:instance) { described_class.new }
   let(:struct_class) { Struct.new(:foo, :bar) }
   let(:struct) { struct_class.new(1234, 'dummy') }
   let(:hash) { {message: 'dummy=1234'} }
   let(:array) { ['dummy string', {message: 'dummy=1234'}] }
+
   describe '#normalize' do
     it 'returns the normalized data' do
       expect(instance.normalize(hash)).to include(message: 'dummy=1234')
@@ -20,17 +27,24 @@ describe Hedgelog::Normalizer do
       instance.normalize(data)
       expect(myvar).to eq orig_myvar
     end
+
+    it 'uses an objects as_json method if available' do
+      expect(instance.normalize(foo: CustomJSONObject.new)).to include(foo: 'JSON')
+    end
   end
+
   describe '#normalize_hash' do
     it 'returns a normalized hash' do
       expect(instance.normalize_hash(hash)).to include(message: 'dummy=1234')
     end
   end
+
   describe '#normalize_struct' do
     it 'returns struct as a normalized hash' do
       expect(instance.normalize_struct(struct)).to include(foo: 1234, bar: 'dummy')
     end
   end
+
   describe '#normalize_array' do
     it 'returns array as a json string' do
       normalized_array = instance.normalize_array(array)
@@ -38,6 +52,7 @@ describe Hedgelog::Normalizer do
       expect(normalized_array).to eq '["dummy string",{"message":"dummy=1234"}]'
     end
   end
+
   context 'When a hash contains different types of data' do
     let(:data) { hash }
     before :each do
