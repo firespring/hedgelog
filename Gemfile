@@ -16,4 +16,5 @@ end
 group :development do
   gem 'ruby-prof'
   gem 'guard-rspec', require: false
+  gem 'listen', '~> 3.0.6'
 end
