@@ -114,6 +114,10 @@ class Hedgelog
     self.level = old_level
   end
 
+  def formatter
+    ::Logger::Formatter.new
+  end
+
   private
 
   def level_to_int(level)
