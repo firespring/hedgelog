@@ -23,7 +23,7 @@ describe Hedgelog do
     describe "\##{level}" do
       let(:log_level) { level.to_sym }
       before :each do
-        Timecop.freeze(2015, 01, 01)
+        Timecop.freeze(2015, 1, 1)
       end
 
       after :each do
@@ -140,6 +140,16 @@ describe Hedgelog do
         expect(logger).to receive(:add).with(severity, nil, nil, anything)
         subject
       end
+    end
+  end
+
+  describe 'silence' do
+    let(:log_level) { :debug }
+    let(:log_exec) { -> { logger.silence(Logger::INFO) { logger.debug 'Foo' } } }
+
+    it 'silences the log' do
+      log_exec.call
+      expect(log_dev.string).to be_empty
     end
   end
 

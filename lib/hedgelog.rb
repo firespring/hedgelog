@@ -21,6 +21,9 @@ class Hedgelog
   TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N%z'.freeze
   BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
 
+  attr_reader :level
+  attr_writer :app
+
   def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
     @level = LEVELS[:debug]
     @channel = nil
@@ -37,15 +40,11 @@ class Hedgelog
     end
   end
 
-  attr_reader :level
-
   def level=(level)
     int_level = level_to_int(level)
     raise ::ArgumentError, "#{self.class}#level= , #{level} is not a valid level." if int_level.nil?
     @level = int_level
   end
-
-  attr_writer :app
 
   def add(severity = LEVELS[:unknown], message = nil, progname = nil, context = {}, &block)
     return true if (@logdev.nil? && @channel.nil?) || severity < @level
@@ -106,15 +105,24 @@ class Hedgelog
     end
   end
 
+  def silence(temporary_level = LEVELS[:error])
+    old_level = level
+    self.level = temporary_level
+
+    yield self
+  ensure
+    self.level = old_level
+  end
+
   private
 
   def level_to_int(level)
-    return level if level.is_a?(Fixnum)
+    return level if level.is_a?(Integer)
     LEVELS[level]
   end
 
   def level_from_int(level)
-    return LEVELS[level] if level.is_a?(Fixnum)
+    return LEVELS[level] if level.is_a?(Integer)
     level.to_sym
   end
 
