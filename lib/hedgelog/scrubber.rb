@@ -8,6 +8,7 @@ class Hedgelog
       ]
     end
 
+    # rubocop:disable Security/MarshalLoad
     def scrub(data)
       # Need to Marshal.dump/Marshal.load to deep copy the input so that scrubbing doesn't change global state
       d = Marshal.load(Marshal.dump(data))
@@ -16,5 +17,6 @@ class Hedgelog
       end
       d
     end
+    # rubocop:enable Security/MarshalLoad
   end
 end

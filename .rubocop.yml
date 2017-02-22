@@ -55,3 +55,7 @@ BlockNesting:
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: single_quotes
+
+Style/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'
