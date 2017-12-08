@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'hedgelog/version'
 require 'hedgelog/context'
 require 'hedgelog/scrubber'
@@ -7,7 +8,7 @@ require 'logger'
 require 'yajl'
 
 class Hedgelog
-  LEVELS = %w(DEBUG INFO WARN ERROR FATAL UNKNOWN).each_with_object({}).with_index do |(v, h), i|
+  LEVELS = %w[DEBUG INFO WARN ERROR FATAL UNKNOWN].each_with_object({}).with_index do |(v, h), i|
     h[v] = i
     h[v.downcase] = i
     h[v.to_sym] = i
@@ -15,8 +16,8 @@ class Hedgelog
     h[i] = v.downcase.to_sym
   end.freeze
 
-  TOP_LEVEL_KEYS = [:app, :channel, :level, :level_name, :message, :request_id, :timestamp].freeze
-  RESERVED_KEYS = [:app, :level, :level_name, :timestamp, :context, :caller].freeze
+  TOP_LEVEL_KEYS = %i[app channel level level_name message request_id timestamp].freeze
+  RESERVED_KEYS = %i[app level level_name timestamp context caller].freeze
 
   TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N%z'.freeze
   BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
@@ -86,7 +87,7 @@ class Hedgelog
     sc
   end
 
-  %w(fatal error warn info debug unknown).each do |level|
+  %w[fatal error warn info debug unknown].each do |level|
     predicate = "#{level}?".to_sym
     level = level.to_sym
 

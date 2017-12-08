@@ -1,6 +1,5 @@
 class Hedgelog
   class Normalizer
-    # rubocop:disable Security/MarshalLoad
     def normalize(data)
       # Need to Marshal.dump/Marshal.load to deep copy the input so that scrubbing doesn't change global state
       d = Marshal.load(Marshal.dump(data))
