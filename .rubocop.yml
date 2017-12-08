@@ -6,6 +6,9 @@ AllCops:
     - '**/lib/**/*'
   Exclude:
     - 'bin/**/*'
+    - '**/Guardfile'
+    - '**/Gemfile'
+    - '**/Rakefile'
 
 CyclomaticComplexity: 
   Max: 15

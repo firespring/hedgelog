@@ -8,7 +8,7 @@ group :test, :development do
   gem "rspec", "~> 3.3"
   gem "pry"
   gem "simplecov", "~> 0.10"
-  gem "rubocop", "~> 0.33"
+  gem "rubocop", "~> 0.51"
   gem "timecop"
   gem 'benchmark-ips'
 end

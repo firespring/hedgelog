@@ -142,7 +142,7 @@ class Hedgelog
 
     data = context.merge(default_data(severity))
     data[:app] = @app if @app
-    data[:caller] = debugharder(caller[3]) if debug?
+    data[:caller] = debugharder(caller(4, 1)) if debug?
     data = extract_top_level_keys(data)
 
     @logdev.write(Yajl::Encoder.encode(data) + "\n")

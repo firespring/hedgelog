@@ -314,14 +314,14 @@ describe Hedgelog do
       let(:level) { Logger::DEBUG }
       context 'when logging a string' do
         it 'is no more than 12x slower than the stdlib logger' do
-          expect { standard_logger.debug(message) }.to perform.times_slower(12).than { hedgelog_logger.debug(*hedgelog_params) }
+          expect { standard_logger.debug(message) }.to perform.times_slower(12).than(hedgelog_logger.debug(*hedgelog_params))
         end
       end
       context 'when logging with context' do
         include_context 'logging with context'
 
         it 'is no more than 16x slower than the stdlib logger' do
-          expect { standard_logger.debug(message) }.to perform.times_slower(16).than { hedgelog_logger.debug(*hedgelog_params) }
+          expect { standard_logger.debug(message) }.to perform.times_slower(16).than(hedgelog_logger.debug(*hedgelog_params))
         end
       end
     end
@@ -329,14 +329,14 @@ describe Hedgelog do
       let(:level) { Logger::INFO }
       context 'when logging a string' do
         it 'is no more than 5x slower than the stdlib logger' do
-          expect { standard_logger.info(message) }.to perform.times_slower(5).than { hedgelog_logger.info(*hedgelog_params) }
+          expect { standard_logger.info(message) }.to perform.times_slower(5).than(hedgelog_logger.info(*hedgelog_params))
         end
       end
       context 'when logging with context' do
         include_context 'logging with context'
 
         it 'is no more than 12x slower than the stdlib logger' do
-          expect { standard_logger.info(message) }.to perform.times_slower(12).than { hedgelog_logger.info(*hedgelog_params) }
+          expect { standard_logger.info(message) }.to perform.times_slower(12).than(hedgelog_logger.info(*hedgelog_params))
         end
       end
     end
