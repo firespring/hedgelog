@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require "bundler/setup"
-require "hedgelog"
+require 'bundler/setup'
+require 'hedgelog'
 require 'ruby-prof'
 require 'logger'
 
@@ -9,12 +9,11 @@ logger = Hedgelog.new('/dev/null')
 logger.level = Logger::INFO
 
 RubyProf.start
-10000.times do
+10_000.times do
   logger.info 'Foo'
 end
 result = RubyProf.stop
 result.eliminate_methods!([/Integer#times/])
-
 
 # printer = RubyProf::GraphPrinter.new(result)
 printer = RubyProf::FlatPrinterWithLineNumbers.new(result)

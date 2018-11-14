@@ -2,13 +2,10 @@
 inherit_from: #{RUBOCOP_HOME}/config/default.yml
 
 AllCops:
-  Include:
-    - '**/lib/**/*'
+  TargetRubyVersion: 2.4
   Exclude:
-    - 'bin/**/*'
-    - '**/Guardfile'
-    - '**/Gemfile'
-    - '**/Rakefile'
+    - 'vendor/**/*'
+    - 'Guardfile'
 
 CyclomaticComplexity: 
   Max: 15
@@ -59,6 +56,12 @@ Style/StringLiterals:
   Enabled: true
   EnforcedStyle: single_quotes
 
-Style/BlockLength:
+Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/AccessModifierDeclarations:
+  EnforcedStyle: inline

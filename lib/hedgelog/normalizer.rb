@@ -5,7 +5,6 @@ class Hedgelog
       d = Marshal.load(Marshal.dump(data))
       normalize_hash(d)
     end
-    # rubocop:enable Security/MarshalLoad
 
     def normalize_struct(struct)
       normalize_hash(Hash[struct.each_pair.to_a])
@@ -21,14 +20,14 @@ class Hedgelog
       array.to_json
     end
 
-    private
-
-    def normalize_thing(thing)
+    private def normalize_thing(thing)
       return '' if thing.nil?
+
       thing = thing.as_json if thing.respond_to?(:as_json)
       return normalize_struct(thing) if thing.is_a?(Struct)
       return normalize_array(thing) if thing.is_a?(Array)
       return normalize_hash(thing) if thing.is_a?(Hash)
+
       thing
     end
   end

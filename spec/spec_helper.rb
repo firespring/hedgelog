@@ -1,11 +1,11 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'pry'
 require 'simplecov'
 require 'hedgelog'
 
-Dir[File.expand_path(File.join(File.dirname(__FILE__), 'support', '**', '*.rb'))].each { |f| require f }
+SimpleCov.minimum_coverage 99
 
-SimpleCov.start
+Dir[File.expand_path(File.join(File.dirname(__FILE__), 'support', '**', '*.rb'))].each { |f| require f }
 
 RSpec.configure do |config|
   config.include Matchers::Benchmark

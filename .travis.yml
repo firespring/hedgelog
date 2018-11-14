@@ -1,28 +1,23 @@
 language: ruby
 cache: bundler
-rvm:
-  - 2.4.0
-  - 2.3.3
-  - 2.2.6
-  - 2.2.2
+rvm: 2.4
 script:
-  - bundle exec rspec
-  - bundle exec rubocop lib spec
+- bundle exec bundle-audit update && bundle exec bundle-audit check
+- bundle exec rspec
+- bundle exec rubocop lib spec
 deploy:
   - provider: releases
     api_key:
-      secure: Ob2+ZdkM5msawA9FnJ8hk7wLgUP9tJg+gOIs1VOpOzq7cqHUmbK2tGwJPSWX+yzFA5A9o520SLJB0MAfnO78DjByRenH1e8keg0uxZ17ci8FDWEPhF53cCjuTLhsaC9qxVcbNps4Z8pg5lQ/0IPaef0lVX0u2jPEHagNBmfJdYLthUPH/M/AcoVT/chjxWw3SNON4LdcUQw5qtpMUe/Clroi5LaaYPWui0o7z6EmlqwV0gFd5oVkXabwuMkWU06tFzxO+AgBT7qeMCDSXqa2ODaWItE74i8TVEMRDHiY+0a0gs76xjsfkml4Q0dNw8YuKcO4p25QskNeTtxi3rZoMToG4e8MfHZG+3YLu3u9VKp0fR7WsL21Jf27dDscXapXyVcMZ+AcklRMEGmKjsyKPnxepcR5RtmoVbDY9/SnJfECa62diZyzMYpjDvu4ZVut5vf/m8AvhnotpwTE2Nilb268f36uIloTG/5zrA113KiEAw5OW0abOm0JFn7t2bZty9D1rwyXiUGZmeS+ZFFE0+zCKXFv5VyK9ZmG4OKbGMMQJRsF+ej70Uv88MbwSS8TDRu0U1bnHBQ6aP3Wc7POihk9M2NAokFppQ9R0htVm0XWrDsxWnEqMMf8HZAQ8fsM9P1jZclgJKnzdSqpKjW4cGAk9i5+mepG6BcASfoUkhk=
+      secure: z/GBmPIgX/UQLixhUnN6fouJbC0PghjW8MeAJJoeIPNqKuv2Kws1wgNOndgrSb+U/gfIZ8CAHTq/U6hlfpGHt7+IBAmO/YMCH/O0CV/MNCfVKwduFTZplcDSnXAiFy77yk+ute0It/L/HJO1LMSq3q1wU2jUWL4CZal/+GY7yVFo8EZQJBeTmvatPd0uD+/+bFwEsYEGKt2/JF42GW6Xtbt9DHXwL1olYmReuPjXavdomZof0KKboM+cI42gzJ5AYVl4ouELGiGQgh5dgK1HkvpBGYqg16YgT0LK5HnQ24slwJk2+yM6x9bXZqQu8IEhPafxR77wJ6T0388iM5vCXtzzJidsOL6mANqpKZ8z1YsAi0w4QNAPvf2AFw40fIfu2W/J4z2UYQUKD/3Em1IY0/fPr+FdMBMWQNevjjns89943GWhFoDUJj4EMt46rEpMHPVTA9DfUA7be4IRo9YrUx7u8MaVotpzSYCxepAmC9tB7KQAjygxI7z/orihZj7lHadUI8rPKfKUkrDDwSyB8xyV5BjpcorSshoqnFLaGrxHfbos/ww5i2xxQEF77RK9rkaICyE7q6oOghCq7BSKsYVzNkBCtRftVy5zYCEPd8MCXxF40S3uv4ta30wQKhdZPWELf4GkzKxCpdbbryWQKoF6ZKceD+LIG18qVlO5AqU=
     file_glob: true
     file: hedgelog-*.gem
     on:
       tags: true
-      rvm: 2.2.2
       repo: firespring/hedgelog
   - provider: rubygems
     api_key:
-      secure: 0lJg8R4FfcC/V0CQP1+MtvaOTHumMczV6W5wNvW+S4C9A+EhWgNdZDZ1tPbLQDRm4rBhr15k6KpZUmR1hMiu2xpN/O9wpdLqrhFccnP8+3qSYWi4Mqns/lFLQtVwlfQeSjQPejHeel7wEDAo/iFs9lgVzyXtusAgIZ8qQLJIa2T8cLE5Kdh/xfJTfdYCojJkw+5XoxARFmiXz5dIBb+1jiYmAULgRQpNUifz+IspAUxDf8BXjZFi7TZeKf34kOnVRUXLdjFOkTIXSx7F1NlSCFUmQtjf1Ft1PfJUwZ+eh5B0u5AL7JMA3pA9T6WNpqJpedVCD5KvkqKeILYFkYriro7K41MCPXBM4CAXSgpqnwiGCR64eBm85nGaRbYIZ+8AdGKxd1wS+fVkpOv4PxDADDD+qPIVTpuTeIJ2+hZYpHdsD5bYtqhvqdUkVOdilnBZKFYHVwHZvkObOoGyk0g3PzwYOUSnG3BJ3YhinTzNuXkOBhUdGN/eZna314hPLVGySTlmpnnof2lWQFArJXTcJXVQBdkSdlML7vvv4QjttOBNX6ICzOimFDrTDIlf3hkrf3+bGva3v0tBn3cz4bLOZgdvWrhhJ+p6TzPCGoseKUE2e+zvBAsPEzjYI9G+hKkSbtT0rFZ6O/Cr21dL/Mbf2WMz0NfhmTc4J3kdP2Y98Ow=
+      secure: anM34Z3fd3H5xt46pVbOmC0FnPsD0Pro9+Vmdv4fq22GvjFolexCtNFt8fb8V+M9THvw1qZDvSyHTZ0NKUDMqaVLX+VhDvquhuM0vviAECBu7kqqZ/pBjBJduYrtcFrCpoL3vs3AhXM882XKIhw4YMtOgoh00DpLZYQbtdEVvCZhbIe80N2eRSM1taVNQQwkI7pREBBFliBrjpP82Vfacue7m/iDKg/k1SRv1jXafQLDM0k8UAdYntc/popqTpXCbmxOcPVv6yVghijld6rTirLeRSrbwq1m0Djg24r/BGd8NsFn9Xtvtm8oZN3Xv2Q8AoJFeDCymTndUtJYrFaS8IQe5TLzXLYW+/BjedCuA09bfcRjW7vjuO73yYqf/K+dTbwbuJMpUJt6Mymu66MuPi6ntj00hvDBU9ekHFkZlemUixq3LxvmEPyxK8PKTLVH9UipkTBG0cXWct5fCXhv0KvrxFLeZM2XXqvknnuYGSIE5fvGLHvn2OuX5JESJzwDt8xBNXrPmCIcDX/DOONR+AuPYQkDLybM75/P+vnxSfT6ZMFj7AxZAr23mWOQ1dK+dgvJb+nbBa+5KRCPs9n9M4aW5ybNKgy8v8Mgp6ebTuRLYDUdOB2aMXRy6/0dqSMR+fe0B7HtHXNtp73Nidox6QBFQzmtXg8fzsXA9yFKFZI=
     gem: hedgelog
     on:
       tags: true
-      rvm: 2.2.2
       repo: firespring/hedgelog

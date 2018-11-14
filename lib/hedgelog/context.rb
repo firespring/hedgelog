@@ -5,6 +5,7 @@ class Hedgelog
   class Context
     def initialize(scrubber, normalizer, data = {})
       raise ::ArgumentError, "#{self.class}: argument must be Hash got #{data.class}." unless data.is_a? Hash
+
       check_reserved_keys(data)
       @data = data
       @scrubber = scrubber
@@ -61,9 +62,7 @@ class Hedgelog
       @data
     end
 
-    private
-
-    def check_reserved_keys(hash)
+    private def check_reserved_keys(hash)
       invalid_keys = Hedgelog::RESERVED_KEYS & hash.keys
       raise ::ArgumentError, "#{self.class}: The following keys are reserved and cannot be used #{invalid_keys.to_a}." unless invalid_keys.empty?
     end

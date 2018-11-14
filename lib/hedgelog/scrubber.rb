@@ -16,6 +16,5 @@ class Hedgelog
       end
       d
     end
-    # rubocop:enable Security/MarshalLoad
   end
 end

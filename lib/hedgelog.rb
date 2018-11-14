@@ -19,8 +19,8 @@ class Hedgelog
   TOP_LEVEL_KEYS = %i[app channel level level_name message request_id timestamp].freeze
   RESERVED_KEYS = %i[app level level_name timestamp context caller].freeze
 
-  TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N%z'.freeze
-  BACKTRACE_RE = /([^:]+):([0-9]+)(?::in `(.*)')?/
+  TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%6N%z'
+  BACKTRACE_RE = Regexp.new("([^:]+):([0-9]+)(?::in `(.*)')?")
 
   attr_reader :level
   attr_writer :app
@@ -44,6 +44,7 @@ class Hedgelog
   def level=(level)
     int_level = level_to_int(level)
     raise ::ArgumentError, "#{self.class}#level= , #{level} is not a valid level." if int_level.nil?
+
     @level = int_level
   end
 
@@ -59,7 +60,7 @@ class Hedgelog
 
     return write(severity, context) if @logdev
 
-    @channel.add(severity, nil, progname, context) if @channel
+    @channel&.add(severity, nil, progname, context)
   end
 
   def []=(key, val)
@@ -119,23 +120,23 @@ class Hedgelog
     ::Logger::Formatter.new
   end
 
-  def formatter=(_)
+  def formatter=(_value)
     formatter
   end
 
-  private
-
-  def level_to_int(level)
+  private def level_to_int(level)
     return level if level.is_a?(Integer)
+
     LEVELS[level]
   end
 
-  def level_from_int(level)
+  private def level_from_int(level)
     return LEVELS[level] if level.is_a?(Integer)
+
     level.to_sym
   end
 
-  def write(severity, context)
+  private def write(severity, context)
     return true if @logdev.nil?
 
     context.normalize!
@@ -150,7 +151,7 @@ class Hedgelog
     true
   end
 
-  def default_data(severity)
+  private def default_data(severity)
     {
       timestamp: Time.now.strftime(TIMESTAMP_FORMAT),
       level_name: level_from_int(severity),
@@ -158,7 +159,7 @@ class Hedgelog
     }
   end
 
-  def extract_top_level_keys(context)
+  private def extract_top_level_keys(context)
     data = {}
     TOP_LEVEL_KEYS.each do |key|
       data[key] = context.delete(key) if context.key? key
@@ -167,9 +168,10 @@ class Hedgelog
     data
   end
 
-  def debugharder(callinfo)
+  private def debugharder(callinfo)
     m = BACKTRACE_RE.match(callinfo)
     return unless m
+
     path, line, method = m[1..3]
     whence = $LOAD_PATH.find { |p| path.start_with?(p) }
     file = if whence
