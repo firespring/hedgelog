@@ -17,6 +17,11 @@ describe Hedgelog::ScrubReplacement do
       it { should eq 'password:*****' }
     end
 
+    context 'the input looks like a ruby hash' do
+      let(:input) { '"password"=>"bar"' }
+      it { should eq '"password"=>"*****"'}
+    end
+
     context 'the input looks like a key value pair in JSON' do
       let(:input) { '{ "password": "bar" }' }
       it { should eq '{ "password": "*****" }' }
