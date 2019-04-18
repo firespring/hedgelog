@@ -1,20 +1,50 @@
+# coding: utf-8
+require 'pry'
+
 class Hedgelog
   class ScrubReplacement
     def initialize(key, replacement)
       @key = key
       @replacement = replacement
-      @match_regex = /("?)(#{@key})("?)(=?>?:?\s?)("?)([a-zA-Z0-9]*)("?)/
+      #@match_regex = /("?)#{@key}\1(=>|=|:)(\s*)(\\?)("?)(.+)(?:(\\"))/
+      #@match_regex = /("?)#{@key}\1(\")(=>|=|:)(\s*)("?)(.+)(\")/
+      @match_regex = /(\\"|:)?#{@key}(\\"|\s)?(=>|=|:)(\s*)("?)(.+)[^,\s&;]/
     end
 
     def scrub_string(string)
       string.gsub!(@match_regex) do
-        quote1 = Regexp.last_match[1]
-        key = Regexp.last_match[2]
-        quote2 = Regexp.last_match[3]
-        separator = Regexp.last_match[4]
-        quote3 = Regexp.last_match[5]
-        quote4 = Regexp.last_match[7]
-        "#{quote1}#{key}#{quote2}#{separator}#{quote3}#{@replacement}#{quote4}"
+        #quote = Regexp.last_match[1]
+        #sep = Regexp.last_match[2]
+        #whitespace = Regexp.last_match[3]
+        # secret = Regexp.last_match[5]
+
+        #rest = Regexp.last_match[8]
+
+        match1 = Regexp.last_match[1]
+        match2 = Regexp.last_match[2]
+        match3 = Regexp.last_match[3]
+        match4 = Regexp.last_match[4]
+        match5 = Regexp.last_match[5]
+        match6 = Regexp.last_match[6]
+        match7 = Regexp.last_match[7]
+        match8 = Regexp.last_match[8]
+
+        match = ""
+        math_arr = []
+        rest = ""
+
+        for i in 1..8 do
+          if Regexp.last_match[i].to_s.include? "\u26A0"
+            match = Regexp.last_match[i]
+            match_arr = match.split("\u26A0")
+            match_arr[0] << "\u26A0"
+            rest = match_arr[1]
+          end
+        end
+
+        #"#{quote}#{@key}#{quote}#{sep}#{whitespace}#{quote}#{quote}#{@replacement}#{quote}#{rest}"
+        "#{match1}#{@key}#{match2}#{match3}#{match4}#{match5}#{@replacement}#{rest}"
+        binding.pry
       end
     end
 

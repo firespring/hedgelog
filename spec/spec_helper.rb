@@ -1,7 +1,6 @@
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'pry'
 require 'simplecov'
-require 'hedgelog'
 
 SimpleCov.minimum_coverage 99
 
