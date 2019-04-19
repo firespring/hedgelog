@@ -6,45 +6,20 @@ class Hedgelog
     def initialize(key, replacement)
       @key = key
       @replacement = replacement
-      #@match_regex = /("?)#{@key}\1(=>|=|:)(\s*)(\\?)("?)(.+)(?:(\\"))/
-      #@match_regex = /("?)#{@key}\1(\")(=>|=|:)(\s*)("?)(.+)(\")/
-      @match_regex = /(\\"|:)?#{@key}(\\"|\s)?(=>|=|:)(\s*)("?)(.+)[^,\s&;]/
+      #@match_regex = /("?)#{@key}\1(=>|=|:)(\s*)("?)(.+?)\4(&|,|;|\s|$)/
+      @match_regex = /("?)#{@key}\1(=>|=|:)(\s*)("?)(.+?)\4(&|,|;|\s|$)/
+      #@match_regex = /(\\"|:)?#{@key}(\\"|\s)?(=>|=|:)(\s*)("?)(.+)[^,\s&;]/
     end
 
     def scrub_string(string)
       string.gsub!(@match_regex) do
-        #quote = Regexp.last_match[1]
-        #sep = Regexp.last_match[2]
-        #whitespace = Regexp.last_match[3]
+        quote1 = Regexp.last_match[1]
+        sep = Regexp.last_match[2]
+        whitespace = Regexp.last_match[3]
+        quote2 = Regexp.last_match[4]
         # secret = Regexp.last_match[5]
-
-        #rest = Regexp.last_match[8]
-
-        match1 = Regexp.last_match[1]
-        match2 = Regexp.last_match[2]
-        match3 = Regexp.last_match[3]
-        match4 = Regexp.last_match[4]
-        match5 = Regexp.last_match[5]
-        match6 = Regexp.last_match[6]
-        match7 = Regexp.last_match[7]
-        match8 = Regexp.last_match[8]
-
-        match = ""
-        math_arr = []
-        rest = ""
-
-        for i in 1..8 do
-          if Regexp.last_match[i].to_s.include? "\u26A0"
-            match = Regexp.last_match[i]
-            match_arr = match.split("\u26A0")
-            match_arr[0] << "\u26A0"
-            rest = match_arr[1]
-          end
-        end
-
-        #"#{quote}#{@key}#{quote}#{sep}#{whitespace}#{quote}#{quote}#{@replacement}#{quote}#{rest}"
-        "#{match1}#{@key}#{match2}#{match3}#{match4}#{match5}#{@replacement}#{rest}"
-        binding.pry
+        rest = Regexp.last_match[6]
+        "#{quote1}#{@key}#{quote1}#{sep}#{whitespace}#{quote2}#{@replacement}#{quote2}#{rest}"
       end
     end
 

@@ -30,13 +30,13 @@ describe Hedgelog::ScrubReplacement do
       let(:input) do
         { key=>secret,"publicvar"=>"foo" }.to_json
       end
-      it { should eq '{"password":"*****", "publicvar":"foo"}' }
+      it { should eq '{"password":"*****","publicvar":"foo"}' }
     end
 
     context 'the input ends in a newline' do
       context 'the input looks like a key value pair' do
         let(:input) { "password:#{secret}\n" }
-        it { should eq 'password:*****\n' }
+        it { should eq "password:*****\n" }
       end
 
       context 'the input looks like a key value pair' do
