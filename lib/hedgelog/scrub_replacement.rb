@@ -1,5 +1,3 @@
-# coding: utf-8
-
 class Hedgelog
   class ScrubReplacement
     def initialize(key, replacement)
