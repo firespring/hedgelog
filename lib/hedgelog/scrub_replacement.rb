@@ -1,5 +1,4 @@
 # coding: utf-8
-require 'pry'
 
 class Hedgelog
   class ScrubReplacement

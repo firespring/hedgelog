@@ -11,24 +11,24 @@ describe Hedgelog::ScrubReplacement do
 
     context 'the input looks like params' do
       let(:input) { "password=#{secret}&publicvar=foo" }
-      it { should eq 'password=*****&publicvar=foo' }
+      it { should eq "password=*****&publicvar=foo" }
     end
 
     context 'the input looks like a key value pair' do
       let(:input) { "password:#{secret};publicvar=foo" }
-      it { should eq 'password:*****;publicvar=foo' }
+      it { should eq "password:*****;publicvar=foo" }
     end
 
     context 'the input looks like a ruby hash' do
       let(:input) do
-        { key=>secret,"publicvar"=>"foo" }.to_s
+        { key => secret,"publicvar" => "foo" }.to_s
       end
       it { should eq '{"password"=>"*****", "publicvar"=>"foo"}' }
     end
 
     context 'the input looks like a key value pair in JSON' do
       let(:input) do
-        { key=>secret,"publicvar"=>"foo" }.to_json
+        { key=>secret,"publicvar" => "foo" }.to_json
       end
       it { should eq '{"password":"*****","publicvar":"foo"}' }
     end
