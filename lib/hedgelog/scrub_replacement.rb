@@ -3,15 +3,17 @@ class Hedgelog
     def initialize(key, replacement)
       @key = key
       @replacement = replacement
-      @match_regex = /("?)#{@key}("?[=:]\s*"?)(.+?)(["&,;\s]|$)/
+      @match_regex = /("?)#{@key}\1(=>|=|:)(\s*)("?)(.+?)\4(&|,|;|\s|$)/
     end
 
     def scrub_string(string)
       string.gsub!(@match_regex) do
-        start = Regexp.last_match[1]
-        eql = Regexp.last_match[2]
-        delim = Regexp.last_match[4]
-        "#{start}#{@key}#{eql}#{@replacement}#{delim}"
+        quote1 = Regexp.last_match[1]
+        sep = Regexp.last_match[2]
+        whitespace = Regexp.last_match[3]
+        quote2 = Regexp.last_match[4]
+        rest = Regexp.last_match[6]
+        "#{quote1}#{@key}#{quote1}#{sep}#{whitespace}#{quote2}#{@replacement}#{quote2}#{rest}"
       end
     end
 

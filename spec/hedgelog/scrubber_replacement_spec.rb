@@ -6,25 +6,35 @@ describe Hedgelog::ScrubReplacement do
     subject { Hedgelog::ScrubReplacement.new(key, replacement).scrub_string(input) }
     let(:key) { 'password' }
     let(:replacement) { '*****' }
+    let(:secret) { 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@\#$%^*()_+={}[]|:"\'<>.?/⚠️' }
 
     context 'the input looks like params' do
-      let(:input) { 'password=bar' }
-      it { should eq 'password=*****' }
+      let(:input) { "password=#{secret}&publicvar=foo" }
+      it { should eq 'password=*****&publicvar=foo' }
     end
 
     context 'the input looks like a key value pair' do
-      let(:input) { 'password:bar' }
-      it { should eq 'password:*****' }
+      let(:input) { "password:#{secret};publicvar=foo" }
+      it { should eq 'password:*****;publicvar=foo' }
+    end
+
+    context 'the input looks like a ruby hash' do
+      let(:input) do
+        {key => secret, 'publicvar' => 'foo'}.to_s
+      end
+      it { should eq '{"password"=>"*****", "publicvar"=>"foo"}' }
     end
 
     context 'the input looks like a key value pair in JSON' do
-      let(:input) { '{ "password": "bar" }' }
-      it { should eq '{ "password": "*****" }' }
+      let(:input) do
+        {key => secret, 'publicvar' => 'foo'}.to_json
+      end
+      it { should eq '{"password":"*****","publicvar":"foo"}' }
     end
 
     context 'the input ends in a newline' do
       context 'the input looks like a key value pair' do
-        let(:input) { "password:bar\n" }
+        let(:input) { "password:#{secret}\n" }
         it { should eq "password:*****\n" }
       end
 
