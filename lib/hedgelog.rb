@@ -25,19 +25,12 @@ class Hedgelog
   attr_reader :level
   attr_writer :app
 
-  def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil, scrubbers = nil)
-    unless scrubbers.nil?
-      scrubbers = scrubbers.map do |x|
-        return x if x instance_of?(Hedgelog::ScrubReplacement)
-        Hedgelog::ScrubReplacement.new(x, '**********')
-      end
-      scrubbers << Hedgelog::ScrubReplacement.new('password', '**********')
-    end
+  def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil, cleaner=nil)
     @level = LEVELS[:debug]
     @channel = nil
     @logdev = nil
     @app = nil
-    @scrubber = Hedgelog::Scrubber.new(scrubbers)
+    @scrubber = Hedgelog::Scrubber.new(cleaner)
     @normalizer = Hedgelog::Normalizer.new
     @channel_context = Hedgelog::Context.new(@scrubber, @normalizer)
 
