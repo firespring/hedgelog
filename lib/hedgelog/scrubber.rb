@@ -4,14 +4,12 @@ class Hedgelog
   class Scrubber
     def initialize(replacements = nil)
       @replacements = [ScrubReplacement.new('password', '**********')]
-      unless replacements.nil?
-        replacements.each do |x|
-          if x.instance_of?(ScrubReplacement)
-            @replacements << x
-          else
-            @replacements << ScrubReplacement.new(x,'**********')
-          end
-        end
+      replacements&.each do |x|
+        @replacements << if x.instance_of?(ScrubReplacement)
+                           x
+                         else
+                           ScrubReplacement.new(x, '**********')
+                         end
       end
     end
 

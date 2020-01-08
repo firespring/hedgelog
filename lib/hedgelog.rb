@@ -25,7 +25,7 @@ class Hedgelog
   attr_reader :level
   attr_writer :app
 
-  def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil, cleaner=nil)
+  def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil, cleaner = nil)
     @level = LEVELS[:debug]
     @channel = nil
     @logdev = nil
