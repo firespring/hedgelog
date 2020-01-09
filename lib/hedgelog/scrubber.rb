@@ -3,9 +3,14 @@ require 'hedgelog/scrub_replacement'
 class Hedgelog
   class Scrubber
     def initialize(replacements = nil)
-      @replacements = replacements || [
-        ScrubReplacement.new('password', '**********')
-      ]
+      @replacements = [ScrubReplacement.new('password', '**********')]
+      replacements&.each do |x|
+        @replacements << if x.instance_of?(ScrubReplacement)
+                           x
+                         else
+                           ScrubReplacement.new(x, '**********')
+                         end
+      end
     end
 
     def scrub(data)
