@@ -25,12 +25,12 @@ class Hedgelog
   attr_reader :level
   attr_writer :app
 
-  def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
+  def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil, cleaner = nil)
     @level = LEVELS[:debug]
     @channel = nil
     @logdev = nil
     @app = nil
-    @scrubber = Hedgelog::Scrubber.new
+    @scrubber = Hedgelog::Scrubber.new(cleaner)
     @normalizer = Hedgelog::Normalizer.new
     @channel_context = Hedgelog::Context.new(@scrubber, @normalizer)
 

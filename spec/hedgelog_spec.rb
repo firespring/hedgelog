@@ -60,7 +60,7 @@ describe Hedgelog do
 
   describe '#add' do
     subject do
-      logger = Hedgelog.new(log_dev)
+      logger = Hedgelog.new(log_dev, nil, nil, scrubber)
       logger.level = log_level
       logger.add(severity, message, progname, data, &block)
     end
@@ -69,6 +69,8 @@ describe Hedgelog do
     let(:data) { {} }
     let(:block) { nil }
     let(:severity) { 1 }
+    let(:scrubber) { nil }
+    let(:wash) { '**********' }
 
     context 'when the severity is lower than the log level' do
       let(:log_level) { Logger::FATAL }
@@ -84,11 +86,47 @@ describe Hedgelog do
     end
 
     context 'when logging with a message and data' do
-      let(:data) { {bar: 'baz'} }
-      it 'writes the message in the json hash' do
+      let(:data) { {bar: 'baz', secret: 'secret', password: 'do not see me'} }
+
+      it 'writes the message in the json hash should not be able to see password' do
         subject
         expect(JSON.parse(log_results)).to include('message' => 'Foo')
-        expect(JSON.parse(log_results)['context']).to include('bar' => 'baz')
+        expect(JSON.parse(log_results)['context']).to include('bar' => 'baz', 'secret' => 'secret', 'password' => wash)
+      end
+
+      context 'When the scrubber is a string array' do
+        let(:scrubber) { ['secret'] }
+
+        it 'writes the message and hash context while wiping secret info' do
+          subject
+          expect(JSON.parse(log_results)).to include('message' => 'Foo')
+          expect(JSON.parse(log_results)['context']).to include('bar' => 'baz', 'secret' => wash, 'password' => wash)
+        end
+      end
+      context 'When the scrubber is a ScrubReplacement array' do
+        let(:scrubber) { [Hedgelog::ScrubReplacement.new('secret', wash)] }
+
+        it 'writes message and hash context wipes secret and password' do
+          subject
+          expect(JSON.parse(log_results)).to include('message' => 'Foo')
+          expect(JSON.parse(log_results)['context']).to include('bar' => 'baz')
+          expect(JSON.parse(log_results)['context']).to include('secret' => wash)
+          expect(JSON.parse(log_results)['context']).to include('password' => wash)
+        end
+      end
+
+      context 'When the scrubber is a mixed array' do
+        let(:data) { {bar: 'baz', secret: 'secret', password: 'do not see me', mysterious: 'hidden'} }
+        let(:scrubber) { [Hedgelog::ScrubReplacement.new('secret', wash), 'mysterious'] }
+
+        it 'writes message and hash context wipes secret, password, and mysterious' do
+          subject
+          expect(JSON.parse(log_results)).to include('message' => 'Foo')
+          expect(JSON.parse(log_results)['context']).to include('bar' => 'baz')
+          expect(JSON.parse(log_results)['context']).to include('secret' => wash)
+          expect(JSON.parse(log_results)['context']).to include('password' => wash)
+          expect(JSON.parse(log_results)['context']).to include('mysterious' => wash)
+        end
       end
     end
 
