@@ -25,7 +25,7 @@ class Hedgelog
   attr_reader :level
   attr_writer :app
 
-  def initialize(logdev = STDOUT, shift_age = nil, shift_size = nil)
+  def initialize(logdev = $stdout, shift_age = nil, shift_size = nil)
     @level = LEVELS[:debug]
     @channel = nil
     @logdev = nil
@@ -48,6 +48,7 @@ class Hedgelog
     @level = int_level
   end
 
+  # rubocop:disable Metrics/ParameterLists
   def add(severity = LEVELS[:unknown], message = nil, progname = nil, context = {}, &block)
     return true if (@logdev.nil? && @channel.nil?) || severity < @level
 
@@ -62,6 +63,7 @@ class Hedgelog
 
     @channel&.add(severity, nil, progname, context)
   end
+  # rubocop:enable Metrics/ParameterLists
 
   def []=(key, val)
     @channel_context[key] = val
@@ -147,7 +149,7 @@ class Hedgelog
     data[:caller] = debugharder(caller(4, 1).first) if debug?
     data = extract_top_level_keys(data)
 
-    @logdev.write(Yajl::Encoder.encode(data) + "\n")
+    @logdev.write("#{Yajl::Encoder.encode(data)}\n")
     true
   end
 
@@ -176,7 +178,7 @@ class Hedgelog
     whence = $LOAD_PATH.find { |p| path.start_with?(p) }
     file = if whence
              # Remove the RUBYLIB path portion of the full file name
-             path[whence.length + 1..-1]
+             path[whence.length + 1..]
            else
              # We get here if the path is not in $:
              path

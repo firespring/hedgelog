@@ -5,12 +5,13 @@ require 'hedgelog/version'
 Gem::Specification.new do |spec|
   spec.name          = 'hedgelog'
   spec.version       = Hedgelog::VERSION
+  spec.required_ruby_version = '>= 2.7.0'
   spec.licenses      = ['MIT']
   spec.authors       = ['Jeff Utter']
   spec.email         = ['jeff.utter@firespring.com']
 
   spec.homepage      = 'https://github.com/firespring/hedgelog'
-  spec.summary       = 'A strucutred JSON logger for Ruby'
+  spec.summary       = 'A structured JSON logger for Ruby'
   spec.description   = 'An opinionated/structured JSON logger for Ruby'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

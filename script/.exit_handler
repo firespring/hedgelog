@@ -1,0 +1,50 @@
+#!/bin/bash
+base_dir=$(dirname $BASH_SOURCE)
+. ${base_dir}/.env.colors
+
+exit_handler()
+{
+  RETVAL=$?
+
+  echo
+  if [ $RETVAL -eq 0 ]
+  then
+    echo_green "    Command [ ${BASH_SOURCE[1]} ] completed successfully"
+  else
+    set +o xtrace
+    set_background_red
+    echo "    Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]} - '${BASH_COMMAND}' exited with status $RETVAL"
+
+    # Print out the stack trace
+    if [ ${#FUNCNAME[@]} -gt 2 ]
+    then
+      echo
+      echo "    Stacktrace:"
+      for ((i=1;i<${#FUNCNAME[@]}-1;i++))
+      do
+        echo "      $i: ${BASH_SOURCE[$i+1]}:${BASH_LINENO[$i]} ${FUNCNAME[$i]}(...)"
+      done
+    fi
+    reset_colors
+  fi
+
+  echo
+  exit $RETVAL
+}
+
+int_handler()
+{
+  echo
+  echo_yellow "    Ctrl-C received, exiting"
+  echo
+  exit 130
+}
+
+SHOULD_ADD_EXIT_HANDLER=${SHOULD_ADD_EXIT_HANDLER:-}
+if [ "$SHOULD_ADD_EXIT_HANDLER" = '' ]
+then
+  trap exit_handler EXIT
+  trap int_handler INT
+fi
+export SHOULD_ADD_EXIT_HANDLER=1
+set -o errtrace

@@ -7,13 +7,13 @@ class Hedgelog
     end
 
     def normalize_struct(struct)
-      normalize_hash(Hash[struct.each_pair.to_a])
+      normalize_hash(struct.each_pair.to_a.to_h)
     end
 
     def normalize_hash(hash)
-      Hash[hash.map do |key, val|
-        [key, normalize_thing(val)]
-      end]
+      hash.transform_values do |val|
+        normalize_thing(val)
+      end
     end
 
     def normalize_array(array)

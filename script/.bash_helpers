@@ -1,0 +1,47 @@
+#!/bin/bash
+base_dir=$(dirname $BASH_SOURCE)
+. ${base_dir}/.env.colors
+
+die()
+{
+  echo
+  set_red
+  echo >&2 "$@"
+  reset_colors
+  exit 2
+}
+
+finish()
+{
+  echo
+  set_white
+  echo "$@"
+  reset_colors
+  exit 0
+}
+
+confirm()
+{
+  prompt="${1:-Are you sure? [y/N]}"
+
+  set_yellow
+  echo -n "$prompt "
+  reset_colors
+
+  if [ "${NO_INPUT:-}" == 'true' ]
+  then
+    # Continue if 'NO_INPUT' has been set
+    true
+  else
+    # call with a prompt string or use a default
+    read -r response
+    case "$response" in
+      [yY][eE][sS]|[yY])
+        true
+      ;;
+      *)
+        false
+      ;;
+    esac
+  fi
+}
