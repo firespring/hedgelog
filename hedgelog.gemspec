@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.version       = Hedgelog::VERSION
   spec.required_ruby_version = '>= 2.7.0'
   spec.licenses      = ['MIT']
-  spec.authors       = ['Jeff Utter']
-  spec.email         = ['jeff.utter@firespring.com']
+  spec.authors       = ['Firespring']
+  spec.email         = ['opensource@firespring.com']
 
   spec.homepage      = 'https://github.com/firespring/hedgelog'
   spec.summary       = 'A structured JSON logger for Ruby'
@@ -19,6 +19,5 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'yajl-ruby', '~> 1.4'
   spec.add_development_dependency 'bundler'
 end

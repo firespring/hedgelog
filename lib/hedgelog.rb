@@ -5,7 +5,7 @@ require 'hedgelog/context'
 require 'hedgelog/scrubber'
 require 'hedgelog/normalizer'
 require 'logger'
-require 'yajl'
+require 'json'
 
 class Hedgelog
   LEVELS = %w[DEBUG INFO WARN ERROR FATAL UNKNOWN].each_with_object({}).with_index do |(v, h), i|
@@ -151,7 +151,7 @@ class Hedgelog
     data[:caller] = debugharder(caller(4, 1).first) if debug?
     data = extract_top_level_keys(data)
 
-    @logdev.write("#{Yajl::Encoder.encode(data)}\n")
+    @logdev.write("#{JSON.generate(data)}\n")
     true
   end
 
