@@ -25,6 +25,7 @@ class Hedgelog
   attr_reader :level
   attr_writer :app
 
+  # rubocop:disable Metrics/ParameterLists
   def initialize(logdev = $stdout, shift_age = nil, shift_size = nil, cleaner = nil)
     @level = LEVELS[:debug]
     @channel = nil
@@ -40,6 +41,7 @@ class Hedgelog
       @logdev = Logger::LogDevice.new(logdev, shift_age: shift_age, shift_size: shift_size)
     end
   end
+  # rubocop:enable Metrics/ParameterLists
 
   def level=(level)
     int_level = level_to_int(level)
