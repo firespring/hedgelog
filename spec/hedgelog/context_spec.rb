@@ -86,7 +86,6 @@ describe Hedgelog::Context do
       it 'updates the context with the merged data' do
         expect(instance[:foo]).to eq 'bar'
         instance.merge!(baz: 'qux')
-
         expect(instance.to_h).to include(foo: 'bar', baz: 'qux')
       end
     end
@@ -95,7 +94,6 @@ describe Hedgelog::Context do
       it 'updates the context with the merged data' do
         expect(instance[:foo]).to eq 'bar'
         instance.merge!(foo: 'qux')
-
         expect(instance.to_h).to include(foo: 'bar')
       end
     end

@@ -2,66 +2,77 @@
 inherit_from: #{RUBOCOP_HOME}/config/default.yml
 
 AllCops:
-  TargetRubyVersion: 2.4
+  SuggestExtensions: false
+  TargetRubyVersion: 2.7
   Exclude:
     - 'vendor/**/*'
     - 'Guardfile'
+  NewCops: enable
 
-CyclomaticComplexity: 
-  Max: 15
-
-PerceivedComplexity:
-  Max: 20
-
-MethodLength:
-  Max: 30
-
-ClassLength:
+Gemspec/RequireMFA:
   Enabled: false
 
-LineLength:
+Layout/LeadingCommentSpace:
+  Enabled: false
+
+Layout/LineLength:
   Max: 150
 
-WordArray:
-  Enabled: false
-
-LeadingCommentSpace:
-  Enabled: false
-
-CommentAnnotation:
-  Enabled: false
-
-Documentation:
-  Enabled: false
-
-Next:
-  Enabled: false
-
-OptionalArguments:
-  Enabled: false
-
-SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
-
-SignalException:
-  EnforcedStyle: only_raise
-
-TrivialAccessors:
-  AllowPredicates: true
-
-BlockNesting:
-  Max: 4
-
-Style/StringLiterals:
-  Enabled: true
-  EnforcedStyle: single_quotes
 
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
 
-Style/FrozenStringLiteralComment:
+Metrics/BlockNesting:
+  Max: 4
+
+Metrics/ClassLength:
   Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/MethodLength:
+  Max: 30
+
+Metrics/PerceivedComplexity:
+  Max: 20
 
 Style/AccessModifierDeclarations:
   EnforcedStyle: inline
+
+Style/CommentAnnotation:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/HashConversion:
+  Enabled: true
+
+Style/Next:
+  Enabled: false
+
+Style/OptionalArguments:
+  Enabled: false
+
+Style/RedundantStringEscape:
+  Enabled: true
+
+Style/SignalException:
+  EnforcedStyle: only_raise
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
+
+Style/TrivialAccessors:
+  AllowPredicates: true
+
+Style/WordArray:
+  Enabled: false

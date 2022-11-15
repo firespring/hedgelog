@@ -20,7 +20,7 @@ describe Hedgelog do
   end
 
   %w[debug info warn error fatal unknown].each do |level|
-    describe "\##{level}" do
+    describe "##{level}" do
       let(:log_level) { level.to_sym }
       before :each do
         Timecop.freeze(2015, 1, 1)
@@ -199,7 +199,7 @@ describe Hedgelog do
     end
 
     context 'and the logger is passed a block' do
-      let(:log_exec) { -> { logger.debug { raise Exception, 'This is not be evaluated' } } }
+      let(:log_exec) { -> { logger.debug { raise StandardError, 'This is not be evaluated' } } }
 
       it 'does not log the message' do
         expect(log_results).to be_empty

@@ -17,4 +17,4 @@ result.eliminate_methods!([/Integer#times/])
 
 # printer = RubyProf::GraphPrinter.new(result)
 printer = RubyProf::FlatPrinterWithLineNumbers.new(result)
-printer.print(STDOUT)
+printer.print($stdout)
